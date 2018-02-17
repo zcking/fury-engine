@@ -34,8 +34,7 @@ public class Renderer {
         shaderProgram.createFragmentShader(ResourceUtils.loadResource("/fragment.glsl"));
         shaderProgram.link();
 
-        // TODO - Load from file
-        float[] vertices = new float[] {
+        float[] vertices = new float[]{
                 0.0f, 0.5f, 0.0f,
                 -0.5f, -0.5f, 0.0f,
                 0.5f, -0.5f, 0.0f
@@ -43,18 +42,17 @@ public class Renderer {
 
         FloatBuffer verticesBuffer = null;
         try {
-            verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
+            verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
             verticesBuffer.put(vertices).flip();
 
             // Create the VAO and bind to it
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);
 
-            // Create the VBO and bind to it
+            // Create the VBO and bint to it
             vboId = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(vboId, verticesBuffer, GL_STATIC_DRAW);
-
+            glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
             // Define structure of the data
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 

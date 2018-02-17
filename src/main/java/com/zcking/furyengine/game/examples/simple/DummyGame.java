@@ -46,12 +46,12 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(true);
-        }
-
         window.setClearColor(color, color, color, 0.0f);
-        renderer.clear();
+        renderer.render(window);
+    }
+
+    @Override
+    public void cleanUp() {
+        renderer.cleanUp();
     }
 }

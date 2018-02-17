@@ -33,6 +33,8 @@ public class GameEngine implements Runnable {
             gameLoop();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            cleanUp();
         }
     }
 
@@ -90,5 +92,9 @@ public class GameEngine implements Runnable {
     protected void render() {
         gameLogic.render(window);
         window.update();
+    }
+
+    protected void cleanUp() {
+        gameLogic.cleanUp();
     }
 }
