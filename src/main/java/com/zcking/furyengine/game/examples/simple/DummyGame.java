@@ -1,5 +1,6 @@
 package com.zcking.furyengine.game.examples.simple;
 
+import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.engine.graph.Mesh;
@@ -14,7 +15,7 @@ public class DummyGame implements IGameLogic {
     private int direction = 0;
     private float color = 0.0f;
     private final Renderer renderer;
-    private Mesh mesh;
+    private GameObject[] gameObjects;
 
     public DummyGame() {
         renderer = new Renderer();
@@ -42,7 +43,10 @@ public class DummyGame implements IGameLogic {
                 0.0f, 0.5f, 0.5f,
         };
 
-        mesh = new Mesh(positions, colors, indices);
+        Mesh mesh = new Mesh(positions, colors, indices);
+        GameObject gameObject = new GameObject(mesh);
+        gameObject.setPosition(0, 0, 0);
+        gameObjects = new GameObject[] { gameObject };
     }
 
     @Override
@@ -69,7 +73,7 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window, mesh);
+        renderer.render(window, gameObjects);
     }
 
     @Override

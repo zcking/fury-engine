@@ -1,8 +1,10 @@
 package com.zcking.furyengine.game;
 
+import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.engine.graph.Mesh;
 import com.zcking.furyengine.engine.graph.ShaderProgram;
+import com.zcking.furyengine.engine.graph.Transformation;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.joml.Math;
 import org.joml.Matrix4f;
@@ -31,12 +33,13 @@ public class Renderer {
     private static final float FOV = (float) Math.toRadians(60.0f);
     private static final float Z_NEAR = 0.01f;
     private static final float Z_FAR = 1000.0f;
-    private Matrix4f projectionMatrix;
+    private final Transformation transformation;
 
     private static final String UNIFORM_PROJECTION_MATRIX = "projectionMatrix";
+    private static final String UNIFORM_WORLD_MATRIX = "worldMatrix";
 
     public Renderer() {
-
+        transformation = new Transformation();
     }
 
     public void init(Window window) throws Exception {
@@ -45,17 +48,17 @@ public class Renderer {
         shaderProgram.createFragmentShader(ResourceUtils.loadResource("/fragment.glsl"));
         shaderProgram.link();
 
-        // Create projection matrix
-        float aspectRatio = (float) window.getWidth() / window.getHeight();
-        projectionMatrix = new Matrix4f().perspective(FOV, aspectRatio, Z_NEAR, Z_FAR);
         shaderProgram.createUniform(UNIFORM_PROJECTION_MATRIX);
+        shaderProgram.createUniform(UNIFORM_WORLD_MATRIX);
+
+        window.setClearColor(0, 0, 0, 0);
     }
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Mesh mesh) {
+    public void render(Window window, GameObject[] gameObjects) {
         clear();
 
         if (window.isResized()) {
@@ -65,18 +68,21 @@ public class Renderer {
 
         shaderProgram.bind();
 
-        // Set the projection matrix uniform
+        // Update the projection matrix
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
+                Z_NEAR, Z_FAR);
         shaderProgram.setUniform(UNIFORM_PROJECTION_MATRIX, projectionMatrix);
 
-        // Draw the mesh
-        glBindVertexArray(mesh.getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
-
-        // Restore state
-        glDisableVertexAttribArray(0);
-        glBindVertexArray(0);
+        // Render the game objects
+        for (GameObject gameObject : gameObjects) {
+            Matrix4f worldMatrix = transformation.getWorldMatrix(
+                    gameObject.getPosition(),
+                    gameObject.getRotation(),
+                    gameObject.getScale()
+            );
+            shaderProgram.setUniform(UNIFORM_WORLD_MATRIX, worldMatrix);
+            gameObject.getMesh().render();
+        }
 
         shaderProgram.unbind();
     }
