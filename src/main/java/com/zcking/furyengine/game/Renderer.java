@@ -53,7 +53,7 @@ public class Renderer {
         // Draw the mesh
         glBindVertexArray(mesh.getVaoId());
         glEnableVertexAttribArray(0);
-        glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 
         // Restore state
         glDisableVertexAttribArray(0);
