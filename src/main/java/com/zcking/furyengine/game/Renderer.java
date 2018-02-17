@@ -1,6 +1,7 @@
 package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.Window;
+import com.zcking.furyengine.engine.graph.Mesh;
 import com.zcking.furyengine.engine.graph.ShaderProgram;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.lwjgl.BufferUtils;
@@ -33,46 +34,13 @@ public class Renderer {
         shaderProgram.createVertexShader(ResourceUtils.loadResource("/vertex.glsl"));
         shaderProgram.createFragmentShader(ResourceUtils.loadResource("/fragment.glsl"));
         shaderProgram.link();
-
-        float[] vertices = new float[]{
-                0.0f, 0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f
-        };
-
-        FloatBuffer verticesBuffer = null;
-        try {
-            verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
-            verticesBuffer.put(vertices).flip();
-
-            // Create the VAO and bind to it
-            vaoId = glGenVertexArrays();
-            glBindVertexArray(vaoId);
-
-            // Create the VBO and bint to it
-            vboId = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-            // Define structure of the data
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-
-            // Unbind the VBO
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            // Unbind the VAO
-            glBindVertexArray(0);
-        } finally {
-            if (verticesBuffer != null) {
-                MemoryUtil.memFree(verticesBuffer);
-            }
-        }
     }
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window) {
+    public void render(Window window, Mesh mesh) {
         clear();
 
         if (window.isResized()) {
@@ -82,12 +50,10 @@ public class Renderer {
 
         shaderProgram.bind();
 
-        // Bind to the VAO
-        glBindVertexArray(vaoId);
+        // Draw the mesh
+        glBindVertexArray(mesh.getVaoId());
         glEnableVertexAttribArray(0);
-
-        // Draw the vertices
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
 
         // Restore state
         glDisableVertexAttribArray(0);
@@ -100,15 +66,5 @@ public class Renderer {
         if (shaderProgram != null) {
             shaderProgram.cleanUp();
         }
-
-        glDisableVertexAttribArray(0);
-
-        // Delete the VBO
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(vboId);
-
-        // Delete the VAO
-        glBindVertexArray(0);
-        glDeleteVertexArrays(vaoId);
     }
 }
