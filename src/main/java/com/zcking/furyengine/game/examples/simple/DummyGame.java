@@ -26,17 +26,44 @@ public class DummyGame implements IGameLogic {
         renderer.init(window);
 
         float[] positions = new float[]{
-                -0.5f,  0.5f, -1.05f,
-                -0.5f, -0.5f, -1.05f,
-                0.5f, -0.5f, -1.05f,
-                0.5f, 0.5f, -1.05f,
+                // VO
+                -0.5f,  0.5f,  0.5f,
+                // V1
+                -0.5f, -0.5f,  0.5f,
+                // V2
+                0.5f, -0.5f,  0.5f,
+                // V3
+                0.5f,  0.5f,  0.5f,
+                // V4
+                -0.5f,  0.5f, -0.5f,
+                // V5
+                0.5f,  0.5f, -0.5f,
+                // V6
+                -0.5f, -0.5f, -0.5f,
+                // V7
+                0.5f, -0.5f, -0.5f,
         };
 
         int[] indices = new int[] {
+                // Front face
                 0, 1, 3, 3, 1, 2,
+                // Top Face
+                4, 0, 3, 5, 4, 3,
+                // Right face
+                3, 2, 7, 5, 3, 7,
+                // Left face
+                6, 1, 0, 6, 0, 4,
+                // Bottom face
+                2, 1, 6, 2, 6, 7,
+                // Back face
+                7, 6, 4, 7, 4, 5,
         };
 
         float[] colors = new float[] {
+                0.5f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f,
+                0.0f, 0.0f, 0.5f,
+                0.0f, 0.5f, 0.5f,
                 0.5f, 0.0f, 0.0f,
                 0.0f, 0.5f, 0.0f,
                 0.0f, 0.0f, 0.5f,
@@ -45,7 +72,7 @@ public class DummyGame implements IGameLogic {
 
         Mesh mesh = new Mesh(positions, colors, indices);
         GameObject gameObject = new GameObject(mesh);
-        gameObject.setPosition(0, 0, 0);
+        gameObject.setPosition(0, 0, -2);
         gameObjects = new GameObject[] { gameObject };
     }
 
@@ -62,11 +89,12 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void update(float interval) {
-        color += direction * 0.01f;
-        if (color > 1) {
-            color = 1.0f;
-        } else if (color < 0) {
-            color = 0.0f;
+        for (GameObject gameObject : gameObjects) {
+            float rotation = gameObject.getRotation().x + 1.5f;
+            if (rotation > 360) {
+                rotation = 0;
+            }
+            gameObject.setRotation(rotation, rotation, rotation);
         }
     }
 
