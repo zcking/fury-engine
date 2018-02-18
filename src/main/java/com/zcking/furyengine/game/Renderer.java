@@ -2,6 +2,7 @@ package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.Window;
+import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
 import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Mesh;
@@ -39,6 +40,7 @@ public class Renderer {
     private static final String UNIFORM_SPECULAR_POWER = "specularPower";
     private static final String UNIFORM_POINT_LIGHT = "pointLight";
     private static final String UNIFORM_MATERIAL = "material";
+    private static final String UNIFORM_DIRECTIONAL_LIGHT = "directionalLight";
 
     public Renderer() {
         transformation = new Transformation();
@@ -62,13 +64,15 @@ public class Renderer {
         shaderProgram.createUniform(UNIFORM_SPECULAR_POWER);
         shaderProgram.createUniform(UNIFORM_AMBIENT_LIGHT);
         shaderProgram.createPointLightUniform(UNIFORM_POINT_LIGHT);
+        shaderProgram.createDirectionalLightUniform(UNIFORM_DIRECTIONAL_LIGHT);
     }
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameObject[] gameObjects, Vector3f ambientLight, PointLight pointLight) {
+    public void render(Window window, Camera camera, GameObject[] gameObjects, Vector3f ambientLight,
+                       PointLight pointLight, DirectionalLight directionalLight) {
         clear();
 
         if (window.isResized()) {
@@ -101,6 +105,13 @@ public class Renderer {
         lightPos.y = aux.y;
         lightPos.z = aux.z;
         shaderProgram.setUniform(UNIFORM_POINT_LIGHT, curPointLight);
+
+        // Get a copy of the directional light and transform its position to view coordinates
+        DirectionalLight curDirLight = new DirectionalLight(directionalLight);
+        Vector4f dir = new Vector4f(curDirLight.getDirection(), 0); // again, don't care about translation (dir light)
+        dir.mul(viewMatrix);
+        curDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
+        shaderProgram.setUniform(UNIFORM_DIRECTIONAL_LIGHT, curDirLight);
 
         // Render the game objects
         for (GameObject gameObject : gameObjects) {

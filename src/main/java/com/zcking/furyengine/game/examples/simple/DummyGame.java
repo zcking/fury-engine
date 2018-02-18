@@ -4,6 +4,7 @@ import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
 import com.zcking.furyengine.input.MouseInput;
 import com.zcking.furyengine.engine.Window;
+import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
 import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Material;
@@ -25,7 +26,9 @@ public class DummyGame implements IGameLogic {
 
     private Vector3f cameraInc;
     private PointLight pointLight;
+    private DirectionalLight directionalLight;
     private Vector3f ambientLight;
+    private float lightAngle;
 
     private static final float CAMERA_POS_STEP = 0.05f;
     private static final float MOUSE_SENSITIVITY = 0.8f;
@@ -34,6 +37,7 @@ public class DummyGame implements IGameLogic {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0, 0, 0);
+        lightAngle = -90;
     }
 
     @Override
@@ -61,6 +65,10 @@ public class DummyGame implements IGameLogic {
         pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0, 0, 1);
         pointLight.setAttenuation(att);
+
+        lightPosition = new Vector3f(-1, 0, 0); // "East"
+        lightColor = new Vector3f(1, 1, 1);
+        directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
     }
 
     @Override
@@ -99,11 +107,33 @@ public class DummyGame implements IGameLogic {
             Vector2f rotVec = mouseInput.getDisplVec();
             camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
         }
+
+        // Update directional light direction, intensity and color
+        // (simulating day/night cycle)
+        lightAngle += 1.1f;
+        if (lightAngle > 90) {
+            directionalLight.setIntensity(0);
+            if (lightAngle >= 360) {
+                lightAngle = -90;
+            }
+        } else if (lightAngle <= -80 || lightAngle >= 80) {
+            float factor = 1 - (float) (Math.abs(lightAngle) - 80) / 10.0f;
+            directionalLight.setIntensity(factor);
+            directionalLight.getColor().y = Math.max(factor, 0.9f);
+            directionalLight.getColor().z = Math.max(factor, 0.5f);
+        } else {
+            directionalLight.setIntensity(1);
+            directionalLight.setColor(new Vector3f(1, 1, 1));
+        }
+
+        double angRad = Math.toRadians(lightAngle);
+        directionalLight.getDirection().x = (float)Math.sin(angRad);
+        directionalLight.getDirection().y = (float)Math.cos(angRad);
     }
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameObjects, ambientLight, pointLight);
+        renderer.render(window, camera, gameObjects, ambientLight, pointLight, directionalLight);
     }
 
     @Override
