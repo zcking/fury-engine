@@ -27,13 +27,15 @@
     <lwjgl.version>3.1.5</lwjgl.version>
     <joml.version>1.9.7</joml.version>
     <jbox2d.version>2.2.1.1</jbox2d.version>
+    <pngdecoder.version>1.0</pngdecoder.version>
+    <junit.version>3.8.2</junit.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <version>${junit.version}</version>
     </dependency>
 
     <dependency>
@@ -172,7 +174,7 @@
     <dependency>
       <groupId>org.l33tlabs.twl</groupId>
       <artifactId>pngdecoder</artifactId>
-      <version>1.0</version>
+      <version>${pngdecoder.version}</version>
     </dependency>
 
 
