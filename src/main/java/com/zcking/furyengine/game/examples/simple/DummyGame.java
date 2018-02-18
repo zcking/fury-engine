@@ -37,6 +37,7 @@ public class DummyGame implements IGameLogic {
         renderer.init(window);
 
         Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
+//        Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
 //        Texture texture = new Texture("/textures/grassblock.png");
 //        mesh.setTexture(texture);
 

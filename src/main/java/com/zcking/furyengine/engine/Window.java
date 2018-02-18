@@ -27,7 +27,7 @@ public class Window {
 
     public void init() {
         // TODO: Implement a WindowSettings wrapper for configurable things (resizing, etc.) to pass to this
-        
+
         // Setup the error callback. The default implementation
         // will print the error message in System.err
         GLFWErrorCallback.createPrint(System.err).set();
