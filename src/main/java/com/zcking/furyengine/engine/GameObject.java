@@ -1,6 +1,6 @@
 package com.zcking.furyengine.engine;
 
-import com.zcking.furyengine.engine.graph.Mesh;
+import com.zcking.furyengine.rendering.Mesh;
 import org.joml.Vector3f;
 
 public class GameObject {

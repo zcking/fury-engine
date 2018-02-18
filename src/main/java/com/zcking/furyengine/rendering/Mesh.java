@@ -1,5 +1,6 @@
-package com.zcking.furyengine.engine.graph;
+package com.zcking.furyengine.rendering;
 
+import com.zcking.furyengine.rendering.Texture;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.system.MemoryUtil;
@@ -11,7 +12,6 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
@@ -23,15 +23,11 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Mesh {
 
-    private static final Vector3f DEFAULT_COLOUR = new Vector3f(1.0f, 1.0f, 1.0f);
-
     private final int vaoId;
     private final int vertexCount;
 
     private final List<Integer> vboIdList;
-    private Texture texture;
-
-    private Vector3f color;
+    private Material material;
 
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
         FloatBuffer posBuffer = null;
@@ -39,7 +35,6 @@ public class Mesh {
         IntBuffer indicesBuffer = null;
         FloatBuffer normalsBuffer = null;
         try {
-            color = DEFAULT_COLOUR;
             vertexCount = indices.length;
             vboIdList = new ArrayList<>();
 
@@ -98,20 +93,12 @@ public class Mesh {
         }
     }
 
-    public Texture getTexture() {
-        return texture;
+    public Material getMaterial() {
+        return material;
     }
 
-    public void setTexture(Texture texture) {
-        this.texture = texture;
-    }
-
-    public Vector3f getColor() {
-        return color;
-    }
-
-    public void setColor(Vector3f color) {
-        this.color = color;
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     public int getVaoId() {
@@ -123,6 +110,7 @@ public class Mesh {
     }
 
     public void render() {
+        Texture texture = material.getTexture();
         if (texture != null) {
             // Activate the first texture bank
             glActiveTexture(GL_TEXTURE0);
@@ -156,6 +144,7 @@ public class Mesh {
             glDeleteBuffers(vboId);
         }
 
+        Texture texture = material.getTexture();
         if (texture != null) {
             // Delete the texture
             texture.cleanUp();
@@ -164,10 +153,6 @@ public class Mesh {
         // Delete the VAO
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
-    }
-
-    public boolean isTextured() {
-        return texture != null;
     }
 
 }

@@ -1,5 +1,6 @@
-package com.zcking.furyengine.engine;
+package com.zcking.furyengine.input;
 
+import com.zcking.furyengine.engine.Window;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 

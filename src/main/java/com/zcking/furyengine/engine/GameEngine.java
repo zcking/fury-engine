@@ -1,5 +1,7 @@
 package com.zcking.furyengine.engine;
 
+import com.zcking.furyengine.input.MouseInput;
+
 public class GameEngine implements Runnable {
 
     public static final int TARGET_FPS = 75;

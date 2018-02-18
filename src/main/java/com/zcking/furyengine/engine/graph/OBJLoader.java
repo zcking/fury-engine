@@ -1,10 +1,10 @@
 package com.zcking.furyengine.engine.graph;
 
+import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
