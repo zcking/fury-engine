@@ -2,6 +2,7 @@ package com.zcking.furyengine.rendering;
 
 import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
+import com.zcking.furyengine.lighting.SpotLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -64,6 +65,12 @@ public class ShaderProgram {
         createUniform(uniformName + ".reflectance");
     }
 
+    public void createSpotLightUniform(String uniformName) throws Exception {
+        createPointLightUniform(uniformName + ".pointLight");
+        createUniform(uniformName + ".coneDir");
+        createUniform(uniformName + ".cutOff");
+    }
+
     public void setUniform(String uniformName, Matrix4f value) {
         // Dump the matrix into a float buffer;
         // Allocate the buffer on the stack since the matrix is
@@ -105,6 +112,12 @@ public class ShaderProgram {
         setUniform(uniformName + ".color", directionalLight.getColor());
         setUniform(uniformName + ".direction", directionalLight.getDirection());
         setUniform(uniformName + ".intensity", directionalLight.getIntensity());
+    }
+
+    public void setUniform(String uniformName, SpotLight spotLight) {
+        setUniform(uniformName + ".pointLight", spotLight.getPointLight());
+        setUniform(uniformName + ".coneDir", spotLight.getConeDirection());
+        setUniform(uniformName + ".cutOff", spotLight.getCutOff());
     }
 
     public void setUniform(String uniformName, Material material) {

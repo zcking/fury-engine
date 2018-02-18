@@ -4,6 +4,7 @@ import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
+import com.zcking.furyengine.lighting.SpotLight;
 import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.ShaderProgram;
@@ -41,6 +42,7 @@ public class Renderer {
     private static final String UNIFORM_POINT_LIGHT = "pointLight";
     private static final String UNIFORM_MATERIAL = "material";
     private static final String UNIFORM_DIRECTIONAL_LIGHT = "directionalLight";
+    private static final String UNIFORM_SPOT_LIGHT = "spotLight";
 
     public Renderer() {
         transformation = new Transformation();
@@ -65,6 +67,7 @@ public class Renderer {
         shaderProgram.createUniform(UNIFORM_AMBIENT_LIGHT);
         shaderProgram.createPointLightUniform(UNIFORM_POINT_LIGHT);
         shaderProgram.createDirectionalLightUniform(UNIFORM_DIRECTIONAL_LIGHT);
+        shaderProgram.createSpotLightUniform(UNIFORM_SPOT_LIGHT);
     }
 
     public void clear() {
@@ -72,7 +75,7 @@ public class Renderer {
     }
 
     public void render(Window window, Camera camera, GameObject[] gameObjects, Vector3f ambientLight,
-                       PointLight pointLight, DirectionalLight directionalLight) {
+                       PointLight pointLight, SpotLight spotLight, DirectionalLight directionalLight) {
         clear();
 
         if (window.isResized()) {
@@ -96,6 +99,19 @@ public class Renderer {
         shaderProgram.setUniform(UNIFORM_AMBIENT_LIGHT, ambientLight);
         shaderProgram.setUniform(UNIFORM_SPECULAR_POWER, specularPower);
 
+        // Get a copy of the spot light and transform to view coordinates
+        SpotLight curSpotLight = new SpotLight(spotLight);
+        Vector4f dir = new Vector4f(curSpotLight.getConeDirection(), 0);
+        dir.mul(viewMatrix);
+        curSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
+        Vector3f spotLightPos = curSpotLight.getPointLight().getPosition();
+        Vector4f auxSpot = new Vector4f(spotLightPos, 1);
+        auxSpot.mul(viewMatrix);
+        spotLightPos.x = auxSpot.x;
+        spotLightPos.y = auxSpot.y;
+        spotLightPos.z = auxSpot.z;
+        shaderProgram.setUniform(UNIFORM_SPOT_LIGHT, curSpotLight);
+
         // Get a copy of the light object and transform its positions to view coordinates
         PointLight curPointLight = new PointLight(pointLight);
         Vector3f lightPos = curPointLight.getPosition();
@@ -108,7 +124,7 @@ public class Renderer {
 
         // Get a copy of the directional light and transform its position to view coordinates
         DirectionalLight curDirLight = new DirectionalLight(directionalLight);
-        Vector4f dir = new Vector4f(curDirLight.getDirection(), 0); // again, don't care about translation (dir light)
+        dir = new Vector4f(curDirLight.getDirection(), 0); // again, don't care about translation (dir light)
         dir.mul(viewMatrix);
         curDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
         shaderProgram.setUniform(UNIFORM_DIRECTIONAL_LIGHT, curDirLight);
