@@ -1,9 +1,8 @@
 package com.zcking.furyengine.utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class ResourceUtils {
@@ -34,6 +33,20 @@ public class ResourceUtils {
         }
 
         return contents;
+    }
+
+    public static List<String> readLines(String fileName) throws Exception {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Class.forName(
+                ResourceUtils.class.getName()
+        ).getResourceAsStream(fileName)))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+
+        return lines;
     }
 
 }

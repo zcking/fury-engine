@@ -5,9 +5,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
@@ -28,6 +26,8 @@ public class Window {
     }
 
     public void init() {
+        // TODO: Implement a WindowSettings wrapper for configurable things (resizing, etc.) to pass to this
+        
         // Setup the error callback. The default implementation
         // will print the error message in System.err
         GLFWErrorCallback.createPrint(System.err).set();
@@ -92,6 +92,9 @@ public class Window {
         // Set the clear color
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glEnable(GL_DEPTH_TEST);
+
+        // Shows polygons (useful for demonstration/debugging)
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
     public void update() {

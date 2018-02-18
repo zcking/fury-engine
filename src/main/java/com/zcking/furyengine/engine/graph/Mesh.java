@@ -23,6 +23,8 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Mesh {
 
+    private static final Vector3f DEFAULT_COLOUR = new Vector3f(1.0f, 1.0f, 1.0f);
+
     private final int vaoId;
     private final int vertexCount;
 
@@ -37,6 +39,7 @@ public class Mesh {
         IntBuffer indicesBuffer = null;
         FloatBuffer normalsBuffer = null;
         try {
+            color = DEFAULT_COLOUR;
             vertexCount = indices.length;
             vboIdList = new ArrayList<>();
 
@@ -97,6 +100,10 @@ public class Mesh {
 
     public Texture getTexture() {
         return texture;
+    }
+
+    public void setTexture(Texture texture) {
+        this.texture = texture;
     }
 
     public Vector3f getColor() {
