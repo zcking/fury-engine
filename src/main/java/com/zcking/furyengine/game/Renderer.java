@@ -2,6 +2,7 @@ package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.Window;
+import com.zcking.furyengine.engine.graph.Camera;
 import com.zcking.furyengine.engine.graph.ShaderProgram;
 import com.zcking.furyengine.engine.graph.Transformation;
 import com.zcking.furyengine.utils.ResourceUtils;
@@ -27,7 +28,7 @@ public class Renderer {
     private final Transformation transformation;
 
     private static final String UNIFORM_PROJECTION_MATRIX = "projectionMatrix";
-    private static final String UNIFORM_WORLD_MATRIX = "worldMatrix";
+    private static final String UNIFORM_MODEL_VIEW_MATRIX = "modelViewMatrix";
     private static final String UNIFORM_TEXTURE_SAMPLER = "textureSampler";
 
     public Renderer() {
@@ -41,7 +42,7 @@ public class Renderer {
         shaderProgram.link();
 
         shaderProgram.createUniform(UNIFORM_PROJECTION_MATRIX);
-        shaderProgram.createUniform(UNIFORM_WORLD_MATRIX);
+        shaderProgram.createUniform(UNIFORM_MODEL_VIEW_MATRIX);
         shaderProgram.createUniform(UNIFORM_TEXTURE_SAMPLER);
     }
 
@@ -49,7 +50,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, GameObject[] gameObjects) {
+    public void render(Window window, Camera camera, GameObject[] gameObjects) {
         clear();
 
         if (window.isResized()) {
@@ -62,17 +63,17 @@ public class Renderer {
         // Update the projection matrix
         Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
                 Z_NEAR, Z_FAR);
+
+        // Update the View Matrix
+        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+
         shaderProgram.setUniform(UNIFORM_PROJECTION_MATRIX, projectionMatrix);
         shaderProgram.setUniform(UNIFORM_TEXTURE_SAMPLER, 0);
 
         // Render the game objects
         for (GameObject gameObject : gameObjects) {
-            Matrix4f worldMatrix = transformation.getWorldMatrix(
-                    gameObject.getPosition(),
-                    gameObject.getRotation(),
-                    gameObject.getScale()
-            );
-            shaderProgram.setUniform(UNIFORM_WORLD_MATRIX, worldMatrix);
+            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameObject, viewMatrix);
+            shaderProgram.setUniform(UNIFORM_MODEL_VIEW_MATRIX, modelViewMatrix);
             gameObject.getMesh().render();
         }
 
