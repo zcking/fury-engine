@@ -2,23 +2,14 @@ package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.Window;
-import com.zcking.furyengine.engine.graph.Mesh;
 import com.zcking.furyengine.engine.graph.ShaderProgram;
 import com.zcking.furyengine.engine.graph.Transformation;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.joml.Math;
 import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.system.MemoryUtil;
-
-import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
@@ -37,6 +28,7 @@ public class Renderer {
 
     private static final String UNIFORM_PROJECTION_MATRIX = "projectionMatrix";
     private static final String UNIFORM_WORLD_MATRIX = "worldMatrix";
+    private static final String UNIFORM_TEXTURE_SAMPLER = "textureSampler";
 
     public Renderer() {
         transformation = new Transformation();
@@ -44,14 +36,13 @@ public class Renderer {
 
     public void init(Window window) throws Exception {
         shaderProgram = new ShaderProgram();
-        shaderProgram.createVertexShader(ResourceUtils.loadResource("/vertex.glsl"));
-        shaderProgram.createFragmentShader(ResourceUtils.loadResource("/fragment.glsl"));
+        shaderProgram.createVertexShader(ResourceUtils.loadResource("/shaders/vertex.glsl"));
+        shaderProgram.createFragmentShader(ResourceUtils.loadResource("/shaders/fragment.glsl"));
         shaderProgram.link();
 
         shaderProgram.createUniform(UNIFORM_PROJECTION_MATRIX);
         shaderProgram.createUniform(UNIFORM_WORLD_MATRIX);
-
-        window.setClearColor(0, 0, 0, 0);
+        shaderProgram.createUniform(UNIFORM_TEXTURE_SAMPLER);
     }
 
     public void clear() {
@@ -72,6 +63,7 @@ public class Renderer {
         Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
                 Z_NEAR, Z_FAR);
         shaderProgram.setUniform(UNIFORM_PROJECTION_MATRIX, projectionMatrix);
+        shaderProgram.setUniform(UNIFORM_TEXTURE_SAMPLER, 0);
 
         // Render the game objects
         for (GameObject gameObject : gameObjects) {

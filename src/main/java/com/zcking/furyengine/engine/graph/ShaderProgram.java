@@ -48,6 +48,10 @@ public class ShaderProgram {
         }
     }
 
+    public void setUniform(String uniformName, int value) {
+        glUniform1i(uniforms.get(uniformName), value);
+    }
+
     public void createVertexShader(String shaderCode) throws Exception {
         vertexShaderId = createShader(shaderCode, GL_VERTEX_SHADER);
     }
@@ -67,7 +71,7 @@ public class ShaderProgram {
 
         if (glGetShaderi(shaderId, GL_COMPILE_STATUS) == GL_FALSE) {
             throw new Exception("Error compiling Shader code: " +
-                    glGetShaderInfoLog(shaderId)
+                    glGetShaderInfoLog(shaderId, 1024)
             );
         }
 
@@ -80,7 +84,7 @@ public class ShaderProgram {
         glLinkProgram(programId);
         if (glGetProgrami(programId, GL_LINK_STATUS) == 0) {
             throw new Exception("Error linking Shader code: " +
-                glGetProgramInfoLog(programId)
+                glGetProgramInfoLog(programId, 1024)
             );
         }
 
@@ -95,7 +99,7 @@ public class ShaderProgram {
         glValidateProgram(programId);
         if (glGetProgrami(programId, GL_VALIDATE_STATUS) == GL_FALSE) {
             System.err.println("Warning validating Shader code: " +
-                    glGetProgramInfoLog(programId)
+                    glGetProgramInfoLog(programId, 1024)
             );
         }
     }
