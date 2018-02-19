@@ -73,6 +73,10 @@ public class Renderer {
         shaderProgram.createSpotLightListUniform(UNIFORM_SPOT_LIGHTS, MAX_SPOT_LIGHTS);
     }
 
+    public ShaderProgram getShaderProgram() {
+        return shaderProgram;
+    }
+
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }

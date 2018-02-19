@@ -13,6 +13,7 @@ import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.engine.graph.OBJLoader;
 import com.zcking.furyengine.game.Renderer;
 import com.zcking.furyengine.rendering.Texture;
+import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -47,7 +48,12 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void init(Window window) throws Exception {
-        renderer.init(window);
+        try {
+            renderer.init(window);
+        } catch (Exception e) {
+            DebugUtils.listAllUniforms(renderer.getShaderProgram().getProgramId());
+            throw e;
+        }
 
         float reflectance = 1f;
         //Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
