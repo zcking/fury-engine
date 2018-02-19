@@ -27,9 +27,9 @@ public class DummyGame implements IGameLogic {
     private final Camera camera;
 
     private Vector3f cameraInc;
-    private PointLight pointLight;
+    private PointLight[] pointLights;
     private DirectionalLight directionalLight;
-    private SpotLight spotLight;
+    private SpotLight[] spotLights;
     private Vector3f ambientLight;
     private float lightAngle;
     private float spotAngle = 0;
@@ -50,28 +50,32 @@ public class DummyGame implements IGameLogic {
         renderer.init(window);
 
         float reflectance = 1f;
+        //Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
+        //Material material = new Material(new Vector3f(0.2f, 0.5f, 0.5f), reflectance);
+
         Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
         Texture texture = new Texture("/textures/grassblock.png");
-
-//        Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
-//        Material material = new Material(new Vector4f(0.2f, 0.5f, 0.5f, 0), reflectance);
         Material material = new Material(texture, reflectance);
+
         mesh.setMaterial(material);
+        GameObject gameItem = new GameObject(mesh);
+        gameItem.setScale(0.5f);
+        gameItem.setPosition(0, 0, -2);
+        //gameItem.setPosition(0, 0, -2);
+        //gameItem.setScale(0.1f);
+        //gameItem.setPosition(0, 0, -2);
+        //gameItem.setPosition(0, 0, -0.2f);
+        gameObjects = new GameObject[]{gameItem};
 
-        GameObject gameItem1 = new GameObject(mesh);
-        gameItem1.setScale(0.5f);
-        gameItem1.setPosition(0, 0, -2);
-        gameObjects = new GameObject[]{gameItem1};
-
-        // Ambient light
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
         // Point Light
         Vector3f lightPosition = new Vector3f(0, 0, 1);
         float lightIntensity = 1.0f;
-        pointLight = new PointLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
+        PointLight pointLight = new PointLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
+        pointLights = new PointLight[]{pointLight};
 
         // Spot Light
         lightPosition = new Vector3f(0, 0.0f, 10f);
@@ -80,7 +84,8 @@ public class DummyGame implements IGameLogic {
         pointLight.setAttenuation(att);
         Vector3f coneDir = new Vector3f(0, 0, -1);
         float cutoff = (float) Math.cos(Math.toRadians(140));
-        spotLight = new SpotLight(pointLight, coneDir, cutoff);
+        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutoff);
+        spotLights = new SpotLight[]{spotLight, new SpotLight(spotLight)};
 
         lightPosition = new Vector3f(-1, 0, 0);
         directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
@@ -104,11 +109,11 @@ public class DummyGame implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 1;
         }
-        float lightPos = spotLight.getPointLight().getPosition().z;
+        float lightPos = spotLights[0].getPointLight().getPosition().z;
         if (window.isKeyPressed(GLFW_KEY_N)) {
-            this.spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
+            this.spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
         } else if (window.isKeyPressed(GLFW_KEY_M)) {
-            this.spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
+            this.spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
     }
 
@@ -131,7 +136,7 @@ public class DummyGame implements IGameLogic {
             spotInc = 1;
         }
         double spotAngleRad = Math.toRadians(spotAngle);
-        Vector3f coneDir = spotLight.getConeDirection();
+        Vector3f coneDir = spotLights[0].getConeDirection();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
         // Update directional light direction, intensity and colour
@@ -159,7 +164,7 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameObjects, ambientLight, pointLight, spotLight, directionalLight);
+        renderer.render(window, camera, gameObjects, ambientLight, pointLights, spotLights, directionalLight);
     }
 
     @Override
