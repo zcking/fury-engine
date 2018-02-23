@@ -8,7 +8,8 @@ A lightweight OpenGL game engine built for JVM developers.
 I, this project, nor any future contributors to this project are in no way responsible for any misuse, modification, 
 or distribution of the original source code available from this _book_. The Fury Engine should be interpreted as 
 a incubating library, which uses this _book_'s content--as well as several other resources--to help construct 
-its systems and organization.
+its systems and organization. **For the time being, please consider this project to be 
+a personal following of the aforementioned _book_.**
 
 ---
 
