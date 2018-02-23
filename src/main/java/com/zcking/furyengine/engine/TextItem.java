@@ -99,5 +99,8 @@ public class TextItem extends GameObject {
 
     public void setText(String text) {
         this.text = text;
+        Texture texture = this.getMesh().getMaterial().getTexture();
+        this.getMesh().deleteBuffers();
+        this.setMesh(buildMesh(texture, numCols, numRows));
     }
 }

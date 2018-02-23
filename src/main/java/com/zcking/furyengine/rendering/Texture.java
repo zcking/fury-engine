@@ -10,26 +10,15 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 public class Texture {
 
     private final int id;
+    private final int width;
+    private final int height;
 
     public Texture(String filePath) throws Exception {
-        this(loadTexture(filePath));
-    }
-
-    public Texture(int id) {
-        this.id = id;
-    }
-
-    public void bind() {
-        glBindTexture(GL_TEXTURE_2D, id);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public static int loadTexture(String filePath) throws Exception {
         // Load texture file
         PNGDecoder decoder = new PNGDecoder(Texture.class.getResourceAsStream(filePath));
+
+        this.width = decoder.getWidth();
+        this.height = decoder.getHeight();
 
         // Load texture contents into a byte buffer (4 bytes per pixel)
         ByteBuffer buffer = ByteBuffer.allocateDirect(
@@ -47,8 +36,8 @@ public class Texture {
         // Tell OpenGL how to unpack the bytes. Each component is 1 byte
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // Upload the texture data
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(),
@@ -57,11 +46,26 @@ public class Texture {
         // Generate the mip map data
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        return textureId;
+        this.id = textureId;
+    }
+
+    public void bind() {
+        glBindTexture(GL_TEXTURE_2D, id);
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void cleanUp() {
         glDeleteTextures(id);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }
