@@ -3,7 +3,7 @@ sudo: false
 install: true
 
 script:
-  - if [ -n "$TRAVIS_TAG" ]; then mvn install -Dversion=$TRAVIS_TAG -B -v; else mvn install -B -V; fi
+  - if [ -n "$TRAVIS_TAG" ]; then mvn install -Dversion=$TRAVIS_TAG -B -V; else mvn install -B -V; fi
 
 deploy:
   provider: releases
