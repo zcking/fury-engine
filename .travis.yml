@@ -1,0 +1,19 @@
+language: java
+sudo: false
+install: true
+
+script:
+  - if [ -n "$TRAVIS_TAG" ]; then mvn install -Dversion=$TRAVIS_TAG -B -V; else mvn install -B -V; fi
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: fmym25/cZim2e3/mFRdMTEkYs/gChSFGSg+UGIteLXH2WPL4jPiIKcwOMK5Anub2dULCnOj4GkWdpetgldzPHA0LRt7HszX3n+viGx6mMLxYwIBkPRfdM0aL4onfm4WIhS2l6szy89e8oXW9XXmfhakF5mXZKucWq5Ajit1wZLTdmrKPeyVlLd41IBkNM2eLIVCAJXpBjB4HwhHKgZ7v6hA30RGXbYagaLt96tMVggJChWmE8rRdlGyAyvKeYDvba+3j1hIBfzeNtBOiwUUo9uu6lGHJ522zDVyaQvHGoK0pi83xsbaxpKtJoEjugNNyAXOD1hfM3w1Ipo4RykTg4klCsMk9JIuxsY8RDKYf9BUDFkF3dulk377SVmdviOC9TM7YKydmlFjKNd2kl6np1yCs/AeDbzG5M+qjM05q3tpviyy9LqzhMRs+HqbMZOBOd6YxvnYrCLP0Ec4iwiG501CAYYepQcCVcqlriCS1T6s/JvmjBtZXvfN8ergCSASE/32e1jEe54ZNoPPp6DxiOCS1e2vBkc4nNBAeudUd9B6VHiAiHp16soyPZqe+eNTVQCuFtrQtf55RQm3WtQnqxRyOHIiCtR3zK0OOgpnNQe8VSP1C6nmY8MMfI1Cla3YA818haPER6QwO6O34GiLA16WdpHcnC5u8X01OleD7kA0=
+  file:
+    - target/fury-engine-$TRAVIS_TAG.jar
+    - target/fury-engine-$TRAVIS_TAG-jar-with-dependencies.jar
+  on:
+    repo: zcking/fury-engine
+    branch: master
+    tags: true
