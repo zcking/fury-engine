@@ -4,18 +4,43 @@
 
   <groupId>com.zcking</groupId>
   <artifactId>fury-engine</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${version}</version>
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+            <archive>
+              <manifest>
+                <mainClass>com.zcking.furyengine.Main</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
     </build>
     <packaging>jar</packaging>
 
@@ -23,6 +48,7 @@
   <url>http://maven.apache.org</url>
 
   <properties>
+    <version>0.1</version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <lwjgl.version>3.1.5</lwjgl.version>
     <joml.version>1.9.7</joml.version>
