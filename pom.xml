@@ -4,7 +4,7 @@
 
   <groupId>com.zcking</groupId>
   <artifactId>fury-engine</artifactId>
-  <version>0.1</version>
+  <version>${version}</version>
     <build>
       <plugins>
         <plugin>
@@ -48,6 +48,7 @@
   <url>http://maven.apache.org</url>
 
   <properties>
+    <version>0.1</version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <lwjgl.version>3.1.5</lwjgl.version>
     <joml.version>1.9.7</joml.version>
