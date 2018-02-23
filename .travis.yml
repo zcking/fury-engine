@@ -1,19 +1,19 @@
 language: java
 sudo: false
 
-install:
-  if: tag
-  script: echo "Packaging engine"
-  script: mvn install -Dversion=$TRAVIS_TAG -B -V
+stage:
+  install:
+    if: tag
+    script: echo "Packaging engine"
+    script: mvn install -Dversion=$TRAVIS_TAG -B -V
 
+stage:
+  install:
+    if: NOT tag
+    script: echo "Packaging engine"
+    script: mvn install -B -V
 
-install:
-  if: NOT tag
-  script: echo "Packaging engine"
-  script: mvn install -B -V
-
-jobs:
-  include:
+stage:
     if: branch = master AND type = push AND repo = zcking/fury-engine
     - stage: GitHub Release
     script: echo "Deploying to GitHub releases"
