@@ -7,15 +7,16 @@ import com.zcking.furyengine.game.Hud;
 import com.zcking.furyengine.input.MouseInput;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.lighting.DirectionalLight;
-import com.zcking.furyengine.lighting.PointLight;
 import com.zcking.furyengine.lighting.SceneLight;
-import com.zcking.furyengine.lighting.SpotLight;
 import com.zcking.furyengine.rendering.*;
 import com.zcking.furyengine.engine.graph.OBJLoader;
 import com.zcking.furyengine.game.Renderer;
 import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
@@ -27,8 +28,6 @@ public class DummyGame implements IGameLogic {
 
     private Vector3f cameraInc;
     private float lightAngle;
-    private float spotAngle = 0;
-    private float spotInc = 1;
     private Hud hud;
     private Scene scene;
 
@@ -47,7 +46,7 @@ public class DummyGame implements IGameLogic {
         try {
             renderer.init(window);
         } catch (Exception e) {
-            DebugUtils.listAllUniforms(renderer.getSceneShaderProgram().getProgramId());
+//            DebugUtils.listAllUniforms(renderer.getSceneShaderProgram().getProgramId());
             throw e;
         }
 
@@ -61,7 +60,7 @@ public class DummyGame implements IGameLogic {
         mesh.setMaterial(material);
 
         float blockScale = 0.5f;
-        float skyBoxScale = 10.0f;
+        float skyBoxScale = 50.0f;
         float extension = 2.0f;
 
         float startX = extension * (-skyBoxScale + blockScale);
@@ -189,7 +188,10 @@ public class DummyGame implements IGameLogic {
     @Override
     public void cleanUp() {
         renderer.cleanUp();
-        scene.cleanUp();
+        Map<Mesh, List<GameObject>> mapMeshes = scene.getMeshMap();
+        for (Mesh mesh : mapMeshes.keySet()) {
+            mesh.cleanUp();
+        }
         hud.cleanUp();
     }
 }
