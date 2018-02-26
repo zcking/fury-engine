@@ -93,6 +93,10 @@ public class Window {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glEnable(GL_DEPTH_TEST);
 
+        // Support for transparencies
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         // Shows polygons (useful for demonstration/debugging)
 //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }

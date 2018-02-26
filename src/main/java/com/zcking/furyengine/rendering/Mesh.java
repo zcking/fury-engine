@@ -44,7 +44,7 @@ public class Mesh {
             // Position VBO
             int vboId = glGenBuffers();
             vboIdList.add(vboId);
-            posBuffer = BufferUtils.createFloatBuffer(positions.length);
+            posBuffer = MemoryUtil.memAllocFloat(positions.length);
             posBuffer.put(positions).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
@@ -53,7 +53,7 @@ public class Mesh {
             // Texture coordinates VBO
             vboId = glGenBuffers();
             vboIdList.add(vboId);
-            textureCoordsBuffer = BufferUtils.createFloatBuffer(textCoords.length);
+            textureCoordsBuffer = MemoryUtil.memAllocFloat(textCoords.length);
             textureCoordsBuffer.put(textCoords).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textureCoordsBuffer, GL_STATIC_DRAW);
@@ -62,7 +62,7 @@ public class Mesh {
             // Vertex normals VBO
             vboId = glGenBuffers();
             vboIdList.add(vboId);
-            normalsBuffer = BufferUtils.createFloatBuffer(normals.length);
+            normalsBuffer = MemoryUtil.memAllocFloat(normals.length);
             normalsBuffer.put(normals).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, normalsBuffer, GL_STATIC_DRAW);
@@ -71,7 +71,7 @@ public class Mesh {
             // Index VBO
             vboId = glGenBuffers();
             vboIdList.add(vboId);
-            indicesBuffer = BufferUtils.createIntBuffer(indices.length);
+            indicesBuffer = MemoryUtil.memAllocInt(indices.length);
             indicesBuffer.put(indices).flip();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
@@ -89,6 +89,10 @@ public class Mesh {
 
             if (textureCoordsBuffer != null) {
                 MemoryUtil.memFree(textureCoordsBuffer);
+            }
+
+            if (normalsBuffer != null) {
+                MemoryUtil.memFree(normalsBuffer);
             }
         }
     }
@@ -148,6 +152,20 @@ public class Mesh {
         if (texture != null) {
             // Delete the texture
             texture.cleanUp();
+        }
+
+        // Delete the VAO
+        glBindVertexArray(0);
+        glDeleteVertexArrays(vaoId);
+    }
+
+    public void deleteBuffers() {
+        glDisableVertexAttribArray(0);
+
+        // Delete the VBOs
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        for (int vboId : vboIdList) {
+            glDeleteBuffers(vboId);
         }
 
         // Delete the VAO
