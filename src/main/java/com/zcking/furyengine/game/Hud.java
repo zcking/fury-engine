@@ -1,13 +1,13 @@
 package com.zcking.furyengine.game;
 
-import com.zcking.furyengine.engine.GameObject;
-import com.zcking.furyengine.engine.IHud;
-import com.zcking.furyengine.engine.TextItem;
+import com.zcking.furyengine.engine.*;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.engine.graph.OBJLoader;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
 import org.joml.Vector4f;
+
+import java.awt.*;
 
 public class Hud implements IHud {
 
@@ -15,7 +15,8 @@ public class Hud implements IHud {
 
     private static final int FONT_ROWS = 16;
 
-    private static final String FONT_TEXTURE = "/textures/font_texture.png";
+    private static final Font FONT = new Font("Arial", Font.PLAIN, 20);
+    private static final String CHARSET = "ISO-8859-1";
 
     private final GameObject[] gameObjects;
 
@@ -23,7 +24,8 @@ public class Hud implements IHud {
     private final TextItem statusTextItem;
 
     public Hud(String statusText) throws Exception {
-        this.statusTextItem = new TextItem(statusText, FONT_TEXTURE, FONT_COLS, FONT_ROWS);
+        FontTexture fontTexture = new FontTexture(FONT, CHARSET);
+        this.statusTextItem = new TextItem(statusText, fontTexture);
         this.statusTextItem.getMesh().getMaterial().setAmbientColor(new Vector4f(1, 1, 1, 1));
 
         // Compass
