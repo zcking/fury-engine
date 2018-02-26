@@ -2,6 +2,7 @@ package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.IHud;
+import com.zcking.furyengine.engine.Scene;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
@@ -104,8 +105,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameObject[] gameObjects,
-                       SceneLight sceneLight, IHud hud) {
+    public void render(Window window, Camera camera, Scene scene, IHud hud) {
         clear();
 
         if (window.isResized()) {
@@ -113,11 +113,11 @@ public class Renderer {
             window.setResized(true);
         }
 
-        renderScene(window, camera, gameObjects, sceneLight);
+        renderScene(window, camera, scene);
         renderHud(window, hud);
     }
 
-    public void renderScene(Window window, Camera camera, GameObject[] gameObjects, SceneLight sceneLight) {
+    public void renderScene(Window window, Camera camera, Scene scene) {
         sceneShaderProgram.bind();
 
         // Update the projection matrix
@@ -129,11 +129,11 @@ public class Renderer {
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
         // Update Light Uniforms
-        renderLights(viewMatrix, sceneLight);
+        renderLights(viewMatrix, scene.getSceneLight());
 
         // Render the game objects
         sceneShaderProgram.setUniform(UNIFORM_TEXTURE_SAMPLER, 0);
-        for (GameObject gameObject : gameObjects) {
+        for (GameObject gameObject : scene.getGameObjects()) {
             Mesh mesh = gameObject.getMesh();
 
             // Set model view matrix for this object

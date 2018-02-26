@@ -1,4 +1,4 @@
-package com.zcking.furyengine.engine;
+package com.zcking.furyengine.rendering;
 
 import com.zcking.furyengine.rendering.Texture;
 

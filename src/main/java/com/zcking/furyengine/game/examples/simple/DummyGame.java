@@ -2,6 +2,7 @@ package com.zcking.furyengine.game.examples.simple;
 
 import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
+import com.zcking.furyengine.engine.Scene;
 import com.zcking.furyengine.game.Hud;
 import com.zcking.furyengine.input.MouseInput;
 import com.zcking.furyengine.engine.Window;
@@ -25,7 +26,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 public class DummyGame implements IGameLogic {
 
     private final Renderer renderer;
-    private GameObject[] gameObjects;
     private final Camera camera;
 
     private Vector3f cameraInc;
@@ -33,7 +33,7 @@ public class DummyGame implements IGameLogic {
     private float spotAngle = 0;
     private float spotInc = 1;
     private Hud hud;
-    private SceneLight sceneLight;
+    private Scene scene;
 
     private static final float CAMERA_POS_STEP = 0.05f;
     private static final float MOUSE_SENSITIVITY = 0.8f;
@@ -54,16 +54,15 @@ public class DummyGame implements IGameLogic {
             throw e;
         }
 
-        float reflectance = 1f;
-        //Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
-        //Material material = new Material(new Vector3f(0.2f, 0.5f, 0.5f), reflectance);
+        scene = new Scene();
 
+        // Game Objects setup
+        float reflectance = 1f;
         Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
         Texture texture = new Texture("/textures/grassblock.png");
         Material material = new Material(texture, reflectance);
-
-        sceneLight = new SceneLight();
         mesh.setMaterial(material);
+
         GameObject gameObject = new GameObject(mesh);
         gameObject.setScale(0.5f);
         gameObject.setPosition(0, 0, -2);
@@ -71,33 +70,33 @@ public class DummyGame implements IGameLogic {
         //gameObject.setScale(0.1f);
         //gameObject.setPosition(0, 0, -2);
         //gameObject.setPosition(0, 0, -0.2f);
-        gameObjects = new GameObject[]{gameObject};
+        GameObject[] gameObjects = new GameObject[]{gameObject};
+        scene.setGameObjects(gameObjects);
 
-        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
+        // TODO: Setup SkyBox
 
-        // Point Light
-        Vector3f lightPosition = new Vector3f(0, 0, 1);
-        float lightIntensity = 1.0f;
-        PointLight pointLight = new PointLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
-        PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
-        pointLight.setAttenuation(att);
-        sceneLight.setPointLights(new PointLight[]{pointLight});
-
-        // Spot Light
-        lightPosition = new Vector3f(0, 0.0f, 10f);
-        pointLight = new PointLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
-        att = new PointLight.Attenuation(0.0f, 0.0f, 0.02f);
-        pointLight.setAttenuation(att);
-        Vector3f coneDir = new Vector3f(0, 0, -1);
-        float cutoff = (float) Math.cos(Math.toRadians(140));
-        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutoff);
-        sceneLight.setSpotLights(new SpotLight[]{spotLight, new SpotLight(spotLight)});
-
-        lightPosition = new Vector3f(-1, 0, 0);
-        sceneLight.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity));
+        // Setup lights
+        setupLights();
 
         // Create HUD
         hud = new Hud("DEMO");
+
+        camera.getPosition().x = 0.65f;
+        camera.getPosition().y = 1.15f;
+        camera.getPosition().z = 4.34f;
+    }
+
+    private void setupLights() {
+        SceneLight sceneLight = new SceneLight();
+        scene.setSceneLight(sceneLight);
+
+        // Ambient light
+        sceneLight.setAmbientLight(new Vector3f(1, 1, 1));
+
+        // Directional light
+        float lightIntensity = 1;
+        Vector3f lightPosition = new Vector3f(-1, 0, 0);
+        sceneLight.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity));
     }
 
     @Override
@@ -118,13 +117,6 @@ public class DummyGame implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 1;
         }
-        SpotLight[] spotLights = sceneLight.getSpotLights();
-        float lightPos = spotLights[0].getPointLight().getPosition().z;
-        if (window.isKeyPressed(GLFW_KEY_N)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
-        } else if (window.isKeyPressed(GLFW_KEY_M)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
-        }
     }
 
     @Override
@@ -141,17 +133,7 @@ public class DummyGame implements IGameLogic {
             hud.rotateCompass(camera.getRotation().y);
         }
 
-        // Update spot light direction
-        spotAngle += spotInc * 0.05f;
-        if (spotAngle > 2) {
-            spotInc = -1;
-        } else if (spotAngle < -2) {
-            spotInc = 1;
-        }
-        double spotAngleRad = Math.toRadians(spotAngle);
-        SpotLight[] spotLights = sceneLight.getSpotLights();
-        Vector3f coneDir = spotLights[0].getConeDirection();
-        coneDir.y = (float) Math.sin(spotAngleRad);
+        SceneLight sceneLight = scene.getSceneLight();
 
         // Update directional light direction, intensity and colour
         DirectionalLight directionalLight = sceneLight.getDirectionalLight();
@@ -180,15 +162,13 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         hud.updateSize(window);
-        renderer.render(window, camera, gameObjects, sceneLight, hud);
+        renderer.render(window, camera, scene, hud);
     }
 
     @Override
     public void cleanUp() {
         renderer.cleanUp();
-        for (GameObject gameObject : gameObjects) {
-            gameObject.getMesh().cleanUp();
-        }
+        scene.cleanUp();
         hud.cleanUp();
     }
 }
