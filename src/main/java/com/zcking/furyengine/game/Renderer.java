@@ -12,6 +12,7 @@ import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.ShaderProgram;
 import com.zcking.furyengine.engine.graph.Transformation;
+import com.zcking.furyengine.rendering.SkyBox;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.joml.Math;
 import org.joml.Matrix4f;
@@ -27,6 +28,7 @@ public class Renderer {
 
     private ShaderProgram sceneShaderProgram;
     private ShaderProgram hudShaderProgram;
+    private ShaderProgram skyBoxShaderProgram;
     private float specularPower;
 
     // Field of View (in radians)
@@ -51,6 +53,12 @@ public class Renderer {
     private static final String UNIFORM_HUD_COLOR = "color";
     private static final String UNIFORM_HUD_HAS_TEXTURE = "hasTexture";
 
+    // SkyBox shader uniforms
+    private static final String UNIFORM_SKYBOX_PROJECTION_MATRIX = "projectionMatrix";
+    private static final String UNIFORM_SKYBOX_MODEL_VIEW_MATRIX = "modelViewMatrix";
+    private static final String UNIFORM_SKYBOX_TEXTURE_SAMPLER = "textureSampler";
+    private static final String UNIFORM_SKYBOX_AMBIENT_LIGHT = "ambientLight";
+
     private static final int MAX_SPOT_LIGHTS = 5; // make this the same as in the shader!
     private static final int MAX_POINT_LIGHTS = 5; // make this the same as in the shader!
 
@@ -62,6 +70,7 @@ public class Renderer {
     public void init(Window window) throws Exception {
         setupSceneShader();
         setupHudShader();
+        setupSkyBoxShader();
     }
 
     private void setupSceneShader() throws Exception {
@@ -97,6 +106,19 @@ public class Renderer {
         hudShaderProgram.createUniform(UNIFORM_HUD_HAS_TEXTURE);
     }
 
+    private void setupSkyBoxShader() throws Exception {
+        skyBoxShaderProgram = new ShaderProgram();
+        skyBoxShaderProgram.createVertexShader(ResourceUtils.loadResource("/shaders/skybox_vertex.glsl"));
+        skyBoxShaderProgram.createFragmentShader(ResourceUtils.loadResource("/shaders/skybox_fragment.glsl"));
+        skyBoxShaderProgram.link();
+
+        // Uniforms for the SkyBox shaders
+        skyBoxShaderProgram.createUniform(UNIFORM_SKYBOX_PROJECTION_MATRIX);
+        skyBoxShaderProgram.createUniform(UNIFORM_SKYBOX_MODEL_VIEW_MATRIX);
+        skyBoxShaderProgram.createUniform(UNIFORM_SKYBOX_TEXTURE_SAMPLER);
+        skyBoxShaderProgram.createUniform(UNIFORM_SKYBOX_AMBIENT_LIGHT);
+    }
+
     public ShaderProgram getSceneShaderProgram() {
         return sceneShaderProgram;
     }
@@ -113,6 +135,7 @@ public class Renderer {
             window.setResized(true);
         }
 
+        renderSkyBox(window, camera, scene);
         renderScene(window, camera, scene);
         renderHud(window, hud);
     }
@@ -218,6 +241,31 @@ public class Renderer {
 
     }
 
+    private void renderSkyBox(Window window, Camera camera, Scene scene) {
+        skyBoxShaderProgram.bind();
+
+        skyBoxShaderProgram.setUniform(UNIFORM_SKYBOX_TEXTURE_SAMPLER, 0);
+
+        // Update projection matrix
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix(
+                FOV,
+                window.getWidth(), window.getHeight(),
+                Z_NEAR, Z_FAR);
+        skyBoxShaderProgram.setUniform(UNIFORM_SKYBOX_PROJECTION_MATRIX, projectionMatrix);
+        SkyBox skyBox = scene.getSkyBox();
+        Matrix4f viewMatrix = transformation.getViewMatrix(camera)
+                .m30(0) // Set the translation components to zero--sky box shouldn't move!
+                .m31(0)
+                .m32(0);
+        Matrix4f modelViewMatrix = transformation.getModelViewMatrix(skyBox, viewMatrix);
+        skyBoxShaderProgram.setUniform(UNIFORM_SKYBOX_MODEL_VIEW_MATRIX, modelViewMatrix);
+        skyBoxShaderProgram.setUniform(UNIFORM_SKYBOX_AMBIENT_LIGHT, scene.getSceneLight().getAmbientLight());
+
+        scene.getSkyBox().getMesh().render();
+
+        skyBoxShaderProgram.unbind();
+    }
+
     public void cleanUp() {
         if (sceneShaderProgram != null) {
             sceneShaderProgram.cleanUp();
@@ -225,6 +273,10 @@ public class Renderer {
 
         if (hudShaderProgram != null) {
             hudShaderProgram.cleanUp();
+        }
+
+        if (skyBoxShaderProgram != null) {
+            skyBoxShaderProgram.cleanUp();
         }
     }
 }

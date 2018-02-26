@@ -10,12 +10,9 @@ import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
 import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.lighting.SpotLight;
-import com.zcking.furyengine.rendering.Camera;
-import com.zcking.furyengine.rendering.Material;
-import com.zcking.furyengine.rendering.Mesh;
+import com.zcking.furyengine.rendering.*;
 import com.zcking.furyengine.engine.graph.OBJLoader;
 import com.zcking.furyengine.game.Renderer;
-import com.zcking.furyengine.rendering.Texture;
 import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -63,17 +60,41 @@ public class DummyGame implements IGameLogic {
         Material material = new Material(texture, reflectance);
         mesh.setMaterial(material);
 
-        GameObject gameObject = new GameObject(mesh);
-        gameObject.setScale(0.5f);
-        gameObject.setPosition(0, 0, -2);
-        //gameObject.setPosition(0, 0, -2);
-        //gameObject.setScale(0.1f);
-        //gameObject.setPosition(0, 0, -2);
-        //gameObject.setPosition(0, 0, -0.2f);
-        GameObject[] gameObjects = new GameObject[]{gameObject};
+        float blockScale = 0.5f;
+        float skyBoxScale = 10.0f;
+        float extension = 2.0f;
+
+        float startX = extension * (-skyBoxScale + blockScale);
+        float startY = -1;
+        float startZ = extension * (skyBoxScale - blockScale);
+        float inc = blockScale * 2;
+
+        float posX = startX;
+        float posZ = startZ;
+        float incY = 0;
+        int NUM_ROWS = (int) (extension * skyBoxScale * 2 / inc);
+        int NUM_COLS = (int) (extension * skyBoxScale * 2 / inc);
+        GameObject[] gameObjects = new GameObject[NUM_ROWS * NUM_COLS];
+        for (int i = 0; i < NUM_ROWS; i++) {
+            for (int j = 0; j < NUM_COLS; j++) {
+                GameObject gameObject = new GameObject(mesh);
+                gameObject.setScale(blockScale);
+                incY = Math.random() > 0.9f ? blockScale * 2 : 0f;
+                gameObject.setPosition(posX, startY + incY, posZ);
+                gameObjects[i * NUM_COLS + j] = gameObject;
+
+                posX += inc;
+            }
+
+            posX = startX;
+            posZ -= inc;
+        }
         scene.setGameObjects(gameObjects);
 
-        // TODO: Setup SkyBox
+        // SkyBox
+        SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
+        skyBox.setScale(skyBoxScale);
+        scene.setSkyBox(skyBox);
 
         // Setup lights
         setupLights();
