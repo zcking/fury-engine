@@ -48,6 +48,7 @@ public class Renderer {
     // HUD shader uniforms
     private static final String UNIFORM_HUD_PROJ_MODEL_MATRIX = "projModelMatrix";
     private static final String UNIFORM_HUD_COLOR = "color";
+    private static final String UNIFORM_HUD_HAS_TEXTURE = "hasTexture";
 
     private static final int MAX_SPOT_LIGHTS = 5; // make this the same as in the shader!
     private static final int MAX_POINT_LIGHTS = 5; // make this the same as in the shader!
@@ -92,6 +93,7 @@ public class Renderer {
         // Uniforms for HUD shaders
         hudShaderProgram.createUniform(UNIFORM_HUD_PROJ_MODEL_MATRIX);
         hudShaderProgram.createUniform(UNIFORM_HUD_COLOR);
+        hudShaderProgram.createUniform(UNIFORM_HUD_HAS_TEXTURE);
     }
 
     public ShaderProgram getSceneShaderProgram() {
@@ -157,6 +159,7 @@ public class Renderer {
             Matrix4f projModelMatrix = transformation.getOrthoProjModelMatrix(gameObject, ortho);
             hudShaderProgram.setUniform(UNIFORM_HUD_PROJ_MODEL_MATRIX, projModelMatrix);
             hudShaderProgram.setUniform(UNIFORM_HUD_COLOR, mesh.getMaterial().getAmbientColor());
+            hudShaderProgram.setUniform(UNIFORM_HUD_HAS_TEXTURE, mesh.getMaterial().isTextured() ? 1 : 0);
 
             // Render the mesh for the HUD item
             mesh.render();
