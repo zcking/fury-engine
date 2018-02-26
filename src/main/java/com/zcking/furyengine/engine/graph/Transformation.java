@@ -10,11 +10,13 @@ public class Transformation {
     private final Matrix4f projectionMatrix;
     private final Matrix4f modelViewMatrix;
     private final Matrix4f viewMatrix;
+    private final Matrix4f orthoMatrix;
 
     public Transformation() {
         modelViewMatrix = new Matrix4f();
         projectionMatrix = new Matrix4f();
         viewMatrix = new Matrix4f();
+        orthoMatrix = new Matrix4f();
     }
 
     public final Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
@@ -55,6 +57,26 @@ public class Transformation {
         // Then translate
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
         return viewMatrix;
+    }
+
+    public final Matrix4f getOrthoProjectionMatrix(float left, float right, float bottom, float top) {
+        orthoMatrix.identity();
+        orthoMatrix.setOrtho2D(left, right, bottom, top);
+        return orthoMatrix;
+    }
+
+    public Matrix4f getOrthoProjModelMatrix(GameObject gameObject, Matrix4f orthoMatrix) {
+        Vector3f rotation = gameObject.getRotation();
+        Matrix4f modelMatrix = new Matrix4f();
+        modelMatrix
+                .identity()
+                .translate(gameObject.getPosition())
+                .rotateX((float)Math.toRadians(-rotation.x))
+                .rotateY((float)Math.toRadians(-rotation.y))
+                .rotateZ((float)Math.toRadians(-rotation.z))
+                .scale(gameObject.getScale());
+        Matrix4f orthoMatrixCur = new Matrix4f(orthoMatrix);
+        return orthoMatrixCur.mul(modelMatrix); // Since this is orthographic, I don't use a projection matrix
     }
 
 }

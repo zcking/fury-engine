@@ -12,19 +12,21 @@ import java.util.List;
 public class TextItem extends GameObject {
 
     private static final float ZPOS = 0.0f;
+
     private static final int VERTICES_PER_QUAD = 4;
 
     private String text;
 
     private final int numCols;
+
     private final int numRows;
 
-    public TextItem(String text, String fontFilePath, int numCols, int numRows) throws Exception {
+    public TextItem(String text, String fontFileName, int numCols, int numRows) throws Exception {
         super();
         this.text = text;
         this.numCols = numCols;
         this.numRows = numRows;
-        Texture texture = new Texture(fontFilePath);
+        Texture texture = new Texture(fontFileName);
         this.setMesh(buildMesh(texture, numCols, numRows));
     }
 
@@ -32,18 +34,18 @@ public class TextItem extends GameObject {
         byte[] chars = text.getBytes(Charset.forName("ISO-8859-1"));
         int numChars = chars.length;
 
-        List<Float> positions = new ArrayList<>();
-        List<Float> textCoords = new ArrayList<>();
-        float[] normals = new float[0];
-        List<Integer> indices = new ArrayList<>();
+        List<Float> positions = new ArrayList();
+        List<Float> textCoords = new ArrayList();
+        float[] normals   = new float[0];
+        List<Integer> indices   = new ArrayList();
 
-        float tileWidth = (float) texture.getWidth() / (float) numCols;
-        float tileHeight = (float) texture.getHeight() / (float) numRows;
+        float tileWidth = (float)texture.getWidth() / (float)numCols;
+        float tileHeight = (float)texture.getHeight() / (float)numRows;
 
-        for (int i = 0; i < numChars; i++) {
-            byte curChar = chars[i];
-            int col = curChar % numCols;
-            int row = curChar % numCols;
+        for(int i=0; i<numChars; i++) {
+            byte currChar = chars[i];
+            int col = currChar % numCols;
+            int row = currChar / numCols;
 
             // Build a character tile composed by two triangles
 
@@ -86,8 +88,7 @@ public class TextItem extends GameObject {
 
         float[] posArr = ArrayUtils.listToArray(positions);
         float[] textCoordsArr = ArrayUtils.listToArray(textCoords);
-        int[] indicesArr = indices.stream().mapToInt(i -> i).toArray();
-
+        int[] indicesArr = indices.stream().mapToInt(i->i).toArray();
         Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr);
         mesh.setMaterial(new Material(texture));
         return mesh;

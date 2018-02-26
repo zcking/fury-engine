@@ -20,10 +20,8 @@ public class GameObject {
     }
 
     public GameObject(Mesh mesh) {
+        this();
         this.mesh = mesh;
-        position = new Vector3f(0, 0, 0);
-        scale = 1;
-        rotation = new Vector3f(0, 0, 0);
     }
 
     public Vector3f getPosition() {

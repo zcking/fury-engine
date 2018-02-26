@@ -2,10 +2,12 @@ package com.zcking.furyengine.game.examples.simple;
 
 import com.zcking.furyengine.engine.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
+import com.zcking.furyengine.game.Hud;
 import com.zcking.furyengine.input.MouseInput;
 import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
+import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.lighting.SpotLight;
 import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Material;
@@ -16,7 +18,6 @@ import com.zcking.furyengine.rendering.Texture;
 import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
@@ -28,13 +29,11 @@ public class DummyGame implements IGameLogic {
     private final Camera camera;
 
     private Vector3f cameraInc;
-    private PointLight[] pointLights;
-    private DirectionalLight directionalLight;
-    private SpotLight[] spotLights;
-    private Vector3f ambientLight;
     private float lightAngle;
     private float spotAngle = 0;
     private float spotInc = 1;
+    private Hud hud;
+    private SceneLight sceneLight;
 
     private static final float CAMERA_POS_STEP = 0.05f;
     private static final float MOUSE_SENSITIVITY = 0.8f;
@@ -51,7 +50,7 @@ public class DummyGame implements IGameLogic {
         try {
             renderer.init(window);
         } catch (Exception e) {
-            DebugUtils.listAllUniforms(renderer.getShaderProgram().getProgramId());
+            DebugUtils.listAllUniforms(renderer.getSceneShaderProgram().getProgramId());
             throw e;
         }
 
@@ -63,17 +62,18 @@ public class DummyGame implements IGameLogic {
         Texture texture = new Texture("/textures/grassblock.png");
         Material material = new Material(texture, reflectance);
 
+        sceneLight = new SceneLight();
         mesh.setMaterial(material);
-        GameObject gameItem = new GameObject(mesh);
-        gameItem.setScale(0.5f);
-        gameItem.setPosition(0, 0, -2);
-        //gameItem.setPosition(0, 0, -2);
-        //gameItem.setScale(0.1f);
-        //gameItem.setPosition(0, 0, -2);
-        //gameItem.setPosition(0, 0, -0.2f);
-        gameObjects = new GameObject[]{gameItem};
+        GameObject gameObject = new GameObject(mesh);
+        gameObject.setScale(0.5f);
+        gameObject.setPosition(0, 0, -2);
+        //gameObject.setPosition(0, 0, -2);
+        //gameObject.setScale(0.1f);
+        //gameObject.setPosition(0, 0, -2);
+        //gameObject.setPosition(0, 0, -0.2f);
+        gameObjects = new GameObject[]{gameObject};
 
-        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
+        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
 
         // Point Light
         Vector3f lightPosition = new Vector3f(0, 0, 1);
@@ -81,7 +81,7 @@ public class DummyGame implements IGameLogic {
         PointLight pointLight = new PointLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
-        pointLights = new PointLight[]{pointLight};
+        sceneLight.setPointLights(new PointLight[]{pointLight});
 
         // Spot Light
         lightPosition = new Vector3f(0, 0.0f, 10f);
@@ -91,10 +91,13 @@ public class DummyGame implements IGameLogic {
         Vector3f coneDir = new Vector3f(0, 0, -1);
         float cutoff = (float) Math.cos(Math.toRadians(140));
         SpotLight spotLight = new SpotLight(pointLight, coneDir, cutoff);
-        spotLights = new SpotLight[]{spotLight, new SpotLight(spotLight)};
+        sceneLight.setSpotLights(new SpotLight[]{spotLight, new SpotLight(spotLight)});
 
         lightPosition = new Vector3f(-1, 0, 0);
-        directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity);
+        sceneLight.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity));
+
+        // Create HUD
+        hud = new Hud("DEMO");
     }
 
     @Override
@@ -115,11 +118,12 @@ public class DummyGame implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
             cameraInc.y = 1;
         }
+        SpotLight[] spotLights = sceneLight.getSpotLights();
         float lightPos = spotLights[0].getPointLight().getPosition().z;
         if (window.isKeyPressed(GLFW_KEY_N)) {
-            this.spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
+            spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
         } else if (window.isKeyPressed(GLFW_KEY_M)) {
-            this.spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
+            spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
     }
 
@@ -142,10 +146,12 @@ public class DummyGame implements IGameLogic {
             spotInc = 1;
         }
         double spotAngleRad = Math.toRadians(spotAngle);
+        SpotLight[] spotLights = sceneLight.getSpotLights();
         Vector3f coneDir = spotLights[0].getConeDirection();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
         // Update directional light direction, intensity and colour
+        DirectionalLight directionalLight = sceneLight.getDirectionalLight();
         lightAngle += 1.1f;
         if (lightAngle > 90) {
             directionalLight.setIntensity(0);
@@ -170,7 +176,8 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameObjects, ambientLight, pointLights, spotLights, directionalLight);
+        hud.updateSize(window);
+        renderer.render(window, camera, gameObjects, sceneLight, hud);
     }
 
     @Override
@@ -179,5 +186,6 @@ public class DummyGame implements IGameLogic {
         for (GameObject gameObject : gameObjects) {
             gameObject.getMesh().cleanUp();
         }
+        hud.cleanUp();
     }
 }
