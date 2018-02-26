@@ -2,10 +2,12 @@ package com.zcking.furyengine.rendering;
 
 import com.zcking.furyengine.engine.TextObject;
 import de.matthiasmann.twl.utils.PNGDecoder;
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTBakedChar;
 import static org.lwjgl.stb.STBTruetype.*;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -19,8 +21,12 @@ public class Texture {
     private final STBTTBakedChar.Buffer cData;
 
     public Texture(String filePath) throws Exception {
+        this(Texture.class.getResourceAsStream(filePath));
+    }
+
+    public Texture(InputStream is) throws Exception {
         // Load texture file
-        PNGDecoder decoder = new PNGDecoder(Texture.class.getResourceAsStream(filePath));
+        PNGDecoder decoder = new PNGDecoder(is);
 
         this.width = decoder.getWidth();
         this.height = decoder.getHeight();
