@@ -17,3 +17,7 @@ deploy:
     repo: zcking/fury-engine
     branch: master
     tags: true
+
+notifications:
+  email:
+    on_failure: always
