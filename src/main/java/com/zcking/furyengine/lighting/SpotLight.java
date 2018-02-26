@@ -8,10 +8,10 @@ public class SpotLight {
     private Vector3f coneDirection;
     private float cutOff;
 
-    public SpotLight(PointLight pointLight, Vector3f coneDirection, float cutOff) {
+    public SpotLight(PointLight pointLight, Vector3f coneDirection, float cutOffAngle) {
         this.pointLight = pointLight;
         this.coneDirection = coneDirection;
-        this.cutOff = cutOff;
+        setCutOff(cutOffAngle);
     }
 
     public SpotLight(SpotLight spotLight) {
