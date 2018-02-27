@@ -19,7 +19,7 @@ public class Scene {
     private SceneLight sceneLight;
 
     public Scene() {
-        meshMap = new HashMap();
+        meshMap = new HashMap<>();
     }
 
     public Map<Mesh, List<GameObject>> getMeshMap() {
@@ -54,6 +54,12 @@ public class Scene {
 
     public void setSceneLight(SceneLight sceneLight) {
         this.sceneLight = sceneLight;
+    }
+
+    public void cleanUp() {
+        for (Mesh mesh : meshMap.keySet()) {
+            mesh.cleanUp();
+        }
     }
 
 }
