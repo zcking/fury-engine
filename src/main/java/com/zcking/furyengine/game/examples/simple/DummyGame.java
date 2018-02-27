@@ -1,95 +1,97 @@
 package com.zcking.furyengine.game.examples.simple;
 
-import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
 import com.zcking.furyengine.engine.Scene;
+import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.engine.objects.SkyBox;
 import com.zcking.furyengine.engine.objects.Terrain;
 import com.zcking.furyengine.game.Hud;
+import com.zcking.furyengine.game.Renderer;
 import com.zcking.furyengine.input.MouseInput;
-import com.zcking.furyengine.engine.Window;
 import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.SceneLight;
-import com.zcking.furyengine.rendering.*;
-import com.zcking.furyengine.engine.graph.OBJLoader;
-import com.zcking.furyengine.game.Renderer;
-import com.zcking.furyengine.utils.DebugUtils;
+import com.zcking.furyengine.rendering.Camera;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
 
 public class DummyGame implements IGameLogic {
 
+    private static final float MOUSE_SENSITIVITY = 0.2f;
+
+    private final Vector3f cameraInc;
+
     private final Renderer renderer;
+
     private final Camera camera;
 
-    private Vector3f cameraInc;
-    private float lightAngle;
-    private Hud hud;
     private Scene scene;
 
+    private Hud hud;
+
+    private float lightAngle;
+
     private static final float CAMERA_POS_STEP = 0.05f;
-    private static final float MOUSE_SENSITIVITY = 0.8f;
+
+    private Terrain terrain;
 
     public DummyGame() {
         renderer = new Renderer();
         camera = new Camera();
-        cameraInc = new Vector3f(0, 0, 0);
+        cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
         lightAngle = -90;
     }
 
     @Override
     public void init(Window window) throws Exception {
-        try {
-            renderer.init(window);
-        } catch (Exception e) {
-            DebugUtils.listAllUniforms(renderer.getSceneShaderProgram().getProgramId());
-            throw e;
-        }
+        renderer.init(window);
 
         scene = new Scene();
 
-        float skyBoxScale = 50;
+        float skyBoxScale = 50.0f;
         float terrainScale = 10;
+        //int terrainSize = 3;
         int terrainSize = 3;
         float minY = -0.1f;
         float maxY = 0.1f;
         int textInc = 40;
-        Terrain terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "/textures/heightmap.png",
-                "/textures/terrain.png", textInc);
+        terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "/textures/heightmap.png", "/textures/terrain.png", textInc);
+        //terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "/textures/heightmap_test.png", "/textures/terrain.png", textInc);
         scene.setGameObjects(terrain.getGameObjects());
 
-        // SkyBox
+        // Setup  SkyBox
         SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
         skyBox.setScale(skyBoxScale);
         scene.setSkyBox(skyBox);
 
-        // Setup lights
+        // Setup Lights
         setupLights();
 
         // Create HUD
         hud = new Hud("DEMO");
 
-        camera.getPosition().x = 0.65f;
-        camera.getPosition().y = 1.15f;
-        camera.getPosition().z = 4.34f;
+        camera.getPosition().x = 0.0f;
+        camera.getPosition().y = 5.0f;
+        camera.getPosition().z = 0.0f;
+        camera.getRotation().x = 90;
     }
 
     private void setupLights() {
         SceneLight sceneLight = new SceneLight();
         scene.setSceneLight(sceneLight);
 
-        // Ambient light
-        sceneLight.setAmbientLight(new Vector3f(1, 1, 1));
+        // Ambient Light
+        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
+        sceneLight.setSkyBoxLight(new Vector3f(1.0f, 1.0f, 1.0f));
 
-        // Directional light
-        float lightIntensity = 1;
-        Vector3f lightPosition = new Vector3f(-1, 0, 0);
+        // Directional Light
+        float lightIntensity = 1.0f;
+        Vector3f lightPosition = new Vector3f(1, 1, 0);
         sceneLight.setDirectionalLight(new DirectionalLight(new Vector3f(1, 1, 1), lightPosition, lightIntensity));
     }
 
@@ -115,9 +117,6 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void update(float interval, MouseInput mouseInput) {
-        // Update camera position
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-
         // Update camera based on mouse
         if (mouseInput.isRightButtonPressed()) {
             Vector2f rotVec = mouseInput.getDisplVec();
@@ -127,22 +126,34 @@ public class DummyGame implements IGameLogic {
             hud.rotateCompass(camera.getRotation().y);
         }
 
-        SceneLight sceneLight = scene.getSceneLight();
+        // Update camera position
+        Vector3f prevPos = new Vector3f(camera.getPosition());
+        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
+        // Check if there has been a collision. If true, set the y position to
+        // the maximum height
+        float height = terrain.getHeight(camera.getPosition());
+        if ( camera.getPosition().y <= height )  {
+            camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
+        }
 
-        // Update directional light direction, intensity and colour
+        // Update directional light direction, intensity and color
+        SceneLight sceneLight = scene.getSceneLight();
         DirectionalLight directionalLight = sceneLight.getDirectionalLight();
-        lightAngle += 1.1f;
+        lightAngle += 0.5f;
         if (lightAngle > 90) {
             directionalLight.setIntensity(0);
             if (lightAngle >= 360) {
                 lightAngle = -90;
             }
+            sceneLight.getSkyBoxLight().set(0.3f, 0.3f, 0.3f);
         } else if (lightAngle <= -80 || lightAngle >= 80) {
             float factor = 1 - (float) (Math.abs(lightAngle) - 80) / 10.0f;
+            sceneLight.getSkyBoxLight().set(factor, factor, factor);
             directionalLight.setIntensity(factor);
             directionalLight.getColor().y = Math.max(factor, 0.9f);
             directionalLight.getColor().z = Math.max(factor, 0.5f);
         } else {
+            sceneLight.getSkyBoxLight().set(1.0f, 1.0f, 1.0f);
             directionalLight.setIntensity(1);
             directionalLight.getColor().x = 1;
             directionalLight.getColor().y = 1;
@@ -162,10 +173,8 @@ public class DummyGame implements IGameLogic {
     @Override
     public void cleanUp() {
         renderer.cleanUp();
-        Map<Mesh, List<GameObject>> mapMeshes = scene.getMeshMap();
-        for (Mesh mesh : mapMeshes.keySet()) {
-            mesh.cleanUp();
-        }
+        scene.cleanUp();
         hud.cleanUp();
     }
+
 }
