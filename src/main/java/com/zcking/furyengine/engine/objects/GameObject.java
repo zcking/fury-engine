@@ -1,4 +1,4 @@
-package com.zcking.furyengine.engine;
+package com.zcking.furyengine.engine.objects;
 
 import com.zcking.furyengine.rendering.Mesh;
 import org.joml.Vector3f;

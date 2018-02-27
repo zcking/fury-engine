@@ -3,7 +3,7 @@ package com.zcking.furyengine.game;
 import java.util.List;
 import java.util.Map;
 
-import com.zcking.furyengine.engine.GameObject;
+import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.IHud;
 import com.zcking.furyengine.engine.Scene;
 import com.zcking.furyengine.engine.Window;
@@ -15,7 +15,7 @@ import com.zcking.furyengine.lighting.SpotLight;
 import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.ShaderProgram;
-import com.zcking.furyengine.rendering.SkyBox;
+import com.zcking.furyengine.engine.objects.SkyBox;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

@@ -1,8 +1,9 @@
 package com.zcking.furyengine.engine;
 
+import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.rendering.Mesh;
-import com.zcking.furyengine.rendering.SkyBox;
+import com.zcking.furyengine.engine.objects.SkyBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;

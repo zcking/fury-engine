@@ -1,9 +1,6 @@
 package com.zcking.furyengine.rendering;
 
-import com.zcking.furyengine.engine.GameObject;
-import com.zcking.furyengine.rendering.Texture;
-import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
+import com.zcking.furyengine.engine.objects.GameObject;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;

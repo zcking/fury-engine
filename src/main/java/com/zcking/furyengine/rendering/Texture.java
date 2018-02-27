@@ -1,6 +1,6 @@
 package com.zcking.furyengine.rendering;
 
-import com.zcking.furyengine.engine.TextObject;
+import com.zcking.furyengine.engine.objects.TextObject;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;

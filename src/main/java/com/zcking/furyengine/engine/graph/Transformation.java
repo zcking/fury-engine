@@ -1,6 +1,6 @@
 package com.zcking.furyengine.engine.graph;
 
-import com.zcking.furyengine.engine.GameObject;
+import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.rendering.Camera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

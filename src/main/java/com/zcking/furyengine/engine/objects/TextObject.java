@@ -1,12 +1,11 @@
-package com.zcking.furyengine.engine;
+package com.zcking.furyengine.engine.objects;
 
+import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.Texture;
 import com.zcking.furyengine.utils.BufferUtils;
 import org.lwjgl.stb.STBTTFontinfo;
-import org.lwjgl.stb.STBTruetype.*;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryStack.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

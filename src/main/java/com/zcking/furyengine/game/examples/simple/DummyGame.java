@@ -1,8 +1,9 @@
 package com.zcking.furyengine.game.examples.simple;
 
-import com.zcking.furyengine.engine.GameObject;
+import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
 import com.zcking.furyengine.engine.Scene;
+import com.zcking.furyengine.engine.objects.SkyBox;
 import com.zcking.furyengine.game.Hud;
 import com.zcking.furyengine.input.MouseInput;
 import com.zcking.furyengine.engine.Window;
@@ -11,7 +12,6 @@ import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.rendering.*;
 import com.zcking.furyengine.engine.graph.OBJLoader;
 import com.zcking.furyengine.game.Renderer;
-import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
