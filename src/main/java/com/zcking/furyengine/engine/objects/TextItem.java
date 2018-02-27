@@ -1,8 +1,9 @@
-package com.zcking.furyengine.engine;
+package com.zcking.furyengine.engine.objects;
 
+import com.zcking.furyengine.engine.objects.GameObject;
+import com.zcking.furyengine.rendering.FontTexture;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
-import com.zcking.furyengine.rendering.Texture;
 import com.zcking.furyengine.utils.ArrayUtils;
 
 import java.util.ArrayList;

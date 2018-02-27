@@ -1,14 +1,13 @@
 package com.zcking.furyengine.rendering;
 
-import com.zcking.furyengine.rendering.Texture;
-import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
+import com.zcking.furyengine.engine.objects.GameObject;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -97,6 +96,33 @@ public class Mesh {
         }
     }
 
+    private void initRender() {
+        Texture texture = material.getTexture();
+        if (texture != null) {
+            // Activate the first texture bank
+            glActiveTexture(GL_TEXTURE0);
+
+            // Bind the texture
+            glBindTexture(GL_TEXTURE_2D, texture.getId());
+        }
+
+        // Draw the mesh
+        glBindVertexArray(getVaoId());
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+    }
+
+    private void endRender() {
+        // Restore state
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+        glBindVertexArray(0);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     public Material getMaterial() {
         return material;
     }
@@ -114,29 +140,20 @@ public class Mesh {
     }
 
     public void render() {
-        Texture texture = material.getTexture();
-        if (texture != null) {
-            // Activate the first texture bank
-            glActiveTexture(GL_TEXTURE0);
+        initRender();
+        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        endRender();
+    }
 
-            // Bind the texture
-            glBindTexture(GL_TEXTURE_2D, texture.getId());
+    public void renderList(List<GameObject> gameObjects, Consumer<GameObject> consumer) {
+        initRender();
+
+        for (GameObject gameObject : gameObjects) {
+            consumer.accept(gameObject);
+            glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
         }
 
-        // Draw the mesh
-        glBindVertexArray(getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-
-        // Restore state
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
-        glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        endRender();
     }
 
     public void cleanUp() {

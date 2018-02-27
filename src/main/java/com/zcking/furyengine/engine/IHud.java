@@ -1,5 +1,7 @@
 package com.zcking.furyengine.engine;
 
+import com.zcking.furyengine.engine.objects.GameObject;
+
 public interface IHud {
 
     GameObject[] getGameObjects();
