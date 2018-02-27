@@ -4,6 +4,7 @@ import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.IGameLogic;
 import com.zcking.furyengine.engine.Scene;
 import com.zcking.furyengine.engine.objects.SkyBox;
+import com.zcking.furyengine.engine.objects.Terrain;
 import com.zcking.furyengine.game.Hud;
 import com.zcking.furyengine.input.MouseInput;
 import com.zcking.furyengine.engine.Window;
@@ -12,6 +13,7 @@ import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.rendering.*;
 import com.zcking.furyengine.engine.graph.OBJLoader;
 import com.zcking.furyengine.game.Renderer;
+import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -46,49 +48,21 @@ public class DummyGame implements IGameLogic {
         try {
             renderer.init(window);
         } catch (Exception e) {
-//            DebugUtils.listAllUniforms(renderer.getSceneShaderProgram().getProgramId());
+            DebugUtils.listAllUniforms(renderer.getSceneShaderProgram().getProgramId());
             throw e;
         }
 
         scene = new Scene();
 
-        // Game Objects setup
-        float reflectance = 1f;
-        Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
-        Texture texture = new Texture("/textures/grassblock.png");
-        Material material = new Material(texture, reflectance);
-        mesh.setMaterial(material);
-
-        float blockScale = 0.5f;
-        float skyBoxScale = 50.0f;
-        float extension = 2.0f;
-
-        float startX = extension * (-skyBoxScale + blockScale);
-        float startY = -1;
-        float startZ = extension * (skyBoxScale - blockScale);
-        float inc = blockScale * 2;
-
-        float posX = startX;
-        float posZ = startZ;
-        float incY = 0;
-        int NUM_ROWS = (int) (extension * skyBoxScale * 2 / inc);
-        int NUM_COLS = (int) (extension * skyBoxScale * 2 / inc);
-        GameObject[] gameObjects = new GameObject[NUM_ROWS * NUM_COLS];
-        for (int i = 0; i < NUM_ROWS; i++) {
-            for (int j = 0; j < NUM_COLS; j++) {
-                GameObject gameObject = new GameObject(mesh);
-                gameObject.setScale(blockScale);
-                incY = Math.random() > 0.9f ? blockScale * 2 : 0f;
-                gameObject.setPosition(posX, startY + incY, posZ);
-                gameObjects[i * NUM_COLS + j] = gameObject;
-
-                posX += inc;
-            }
-
-            posX = startX;
-            posZ -= inc;
-        }
-        scene.setGameObjects(gameObjects);
+        float skyBoxScale = 50;
+        float terrainScale = 10;
+        int terrainSize = 3;
+        float minY = -0.1f;
+        float maxY = 0.1f;
+        int textInc = 40;
+        Terrain terrain = new Terrain(terrainSize, terrainScale, minY, maxY, "/textures/heightmap.png",
+                "/textures/terrain.png", textInc);
+        scene.setGameObjects(terrain.getGameObjects());
 
         // SkyBox
         SkyBox skyBox = new SkyBox("/models/skybox.obj", "/textures/skybox.png");
