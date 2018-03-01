@@ -4,6 +4,7 @@ import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.engine.objects.SkyBox;
+import com.zcking.furyengine.rendering.weather.Fog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,8 +19,11 @@ public class Scene {
 
     private SceneLight sceneLight;
 
+    private Fog fog;
+
     public Scene() {
         meshMap = new HashMap<>();
+        fog = Fog.NOFOG;
     }
 
     public Map<Mesh, List<GameObject>> getMeshMap() {
@@ -54,6 +58,14 @@ public class Scene {
 
     public void setSceneLight(SceneLight sceneLight) {
         this.sceneLight = sceneLight;
+    }
+
+    public Fog getFog() {
+        return fog;
+    }
+
+    public void setFog(Fog fog) {
+        this.fog = fog;
     }
 
     public void cleanUp() {

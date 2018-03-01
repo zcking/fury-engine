@@ -3,6 +3,7 @@ package com.zcking.furyengine.rendering;
 import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
 import com.zcking.furyengine.lighting.SpotLight;
+import com.zcking.furyengine.rendering.weather.Fog;
 import com.zcking.furyengine.utils.DebugUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -84,6 +85,12 @@ public class ShaderProgram {
         }
     }
 
+    public void createFogUniform(String uniformName) throws Exception {
+        createUniform(uniformName + ".enabled");
+        createUniform(uniformName + ".color");
+        createUniform(uniformName + ".density");
+    }
+
     public void setUniform(String uniformName, Matrix4f value) {
         // Dump the matrix into a float buffer;
         // Allocate the buffer on the stack since the matrix is
@@ -161,6 +168,12 @@ public class ShaderProgram {
 
     public void setUniform(String uniformName, SpotLight spotLight, int pos) {
         setUniform(uniformName + "[" + pos + "]", spotLight);
+    }
+
+    public void setUniform(String uniformName, Fog fog) {
+        setUniform(uniformName + ".enabled", fog.isEnabled() ? 1 : 0);
+        setUniform(uniformName + ".color", fog.getColor());
+        setUniform(uniformName + ".density", fog.getDensity());
     }
 
     public void createVertexShader(String shaderCode) throws Exception {
