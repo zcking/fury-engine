@@ -51,8 +51,8 @@ public class Terrain {
         boolean found = false;
         GameObject terrainBlock = null;
 
-        for (int row = 0; row < terrainSize; row++) {
-            for (int col = 0; col < terrainSize; col++) {
+        for (int row = 0; row < terrainSize && !found; row++) {
+            for (int col = 0; col < terrainSize && !found; col++) {
                 terrainBlock = gameObjects[row * terrainSize + col];
                 boundingBox = boundingBoxes[row][col];
                 found = boundingBox.contains(position.x, position.z);
