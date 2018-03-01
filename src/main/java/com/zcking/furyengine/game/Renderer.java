@@ -45,6 +45,7 @@ public class Renderer {
     private static final String UNIFORM_MATERIAL = "material";
     private static final String UNIFORM_DIRECTIONAL_LIGHT = "directionalLight";
     private static final String UNIFORM_SPOT_LIGHTS = "spotLights";
+    private static final String UNIFORM_FOG = "fog";
 
     // HUD shader uniforms
     private static final String UNIFORM_HUD_PROJ_MODEL_MATRIX = "projModelMatrix";
@@ -74,8 +75,8 @@ public class Renderer {
     private void setupSceneShader() throws Exception {
         // Create the shaders for scene
         sceneShaderProgram = new ShaderProgram();
-        sceneShaderProgram.createVertexShader(ResourceUtils.loadResource("/shaders/vertex.glsl"));
-        sceneShaderProgram.createFragmentShader(ResourceUtils.loadResource("/shaders/fragment.glsl"));
+        sceneShaderProgram.createVertexShader(ResourceUtils.loadResource("/shaders/scene_vertex.glsl"));
+        sceneShaderProgram.createFragmentShader(ResourceUtils.loadResource("/shaders/scene_fragment.glsl"));
         sceneShaderProgram.link();
 
         // Create the uniforms for the scene shaders
@@ -83,6 +84,7 @@ public class Renderer {
         sceneShaderProgram.createUniform(UNIFORM_MODEL_VIEW_MATRIX);
         sceneShaderProgram.createUniform(UNIFORM_TEXTURE_SAMPLER);
         sceneShaderProgram.createMaterialUniform(UNIFORM_MATERIAL);
+        sceneShaderProgram.createFogUniform(UNIFORM_FOG);
 
         // Light-related uniforms
         sceneShaderProgram.createUniform(UNIFORM_SPECULAR_POWER);
@@ -138,8 +140,10 @@ public class Renderer {
         transformation.updateViewMatrix(camera);
 
         renderScene(window, camera, scene);
-        renderSkyBox(window, camera, scene);
-        renderHud(window, hud);
+        if (scene.getSkyBox() != null)
+            renderSkyBox(window, camera, scene);
+        if (hud != null)
+            renderHud(window, hud);
     }
 
     private void renderSkyBox(Window window, Camera camera, Scene scene) {
@@ -175,6 +179,8 @@ public class Renderer {
         renderLights(viewMatrix, sceneLight);
 
         sceneShaderProgram.setUniform(UNIFORM_TEXTURE_SAMPLER, 0);
+        sceneShaderProgram.setUniform(UNIFORM_FOG, scene.getFog());
+
         // Render each mesh with the associated game objects
         Map<Mesh, List<GameObject>> mapMeshes = scene.getMeshMap();
         for (Mesh mesh : mapMeshes.keySet()) {
