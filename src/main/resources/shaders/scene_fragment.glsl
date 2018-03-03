@@ -7,6 +7,7 @@ in vec2 outTexCoord;
 in vec3 mvVertexNormal;
 in vec3 mvVertexPos;
 in mat4 outModelViewMatrix;
+in vec4 mLightViewVertexPos;
 
 out vec4 fragColor;
 
@@ -53,6 +54,7 @@ struct Fog {
 
 uniform sampler2D textureSampler;
 uniform sampler2D normalMap;
+uniform sampler2D shadowMap;
 uniform vec3 ambientLight;
 uniform float specularPower;
 uniform Material material;
@@ -150,6 +152,20 @@ vec3 calcNormal(Material material, vec3 normal, vec2 textCoord, mat4 modelViewMa
     return newNormal;
 }
 
+float calcShadow(vec4 position) {
+    float shadowFactor = 1.0;
+    vec3 projCoords = position.xyz;
+
+    // Tranform screen coords to texture coords
+    projCoords = projCoords * 0.5 + 0.5;
+    if (projCoords.z < texture(shadowMap, projCoords.xy).r) {
+        // Current fragment is not in the shade
+        shadowFactor = 0;
+    }
+
+    return 1 - shadowFactor;
+}
+
 void main() {
     setupColors(material, outTexCoord);
 
@@ -169,7 +185,8 @@ void main() {
         }
     }
 
-    fragColor = ambientC * vec4(ambientLight, 1) + diffuseSpecularComp;
+    float shadow = calcShadow(mLightViewVertexPos);
+    fragColor = clamp(ambientC * vec4(ambientLight, 1) + diffuseSpecularComp * shadow, 0, 1);
 
     if (fog.enabled == 1) {
         fragColor = calcFog(mvVertexPos, fragColor, fog, ambientLight, directionalLight);

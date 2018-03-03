@@ -7,10 +7,13 @@ layout (location = 2) in vec3 vertexNormal;
 out vec2 outTexCoord;
 out vec3 mvVertexNormal; // mv = ModelView
 out vec3 mvVertexPos;
+out vec4 mLightViewVertexPos;
 out mat4 outModelViewMatrix;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
+uniform mat4 modelLightViewMatrix;
+uniform mat4 orthoProjectionMatrix;
 
 void main() {
     vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
@@ -21,5 +24,6 @@ void main() {
     // The W component of the normal is set to zero beforehand because translation isn't needed
     mvVertexNormal = normalize(modelViewMatrix * vec4(vertexNormal, 0.0)).xyz;
     mvVertexPos = mvPos.xyz;
+    mLightViewVertexPos = orthoProjectionMatrix * modelLightViewMatrix * vec4(position, 1.0);
     outModelViewMatrix = modelViewMatrix;
 }
