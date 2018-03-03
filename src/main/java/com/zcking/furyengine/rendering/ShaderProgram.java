@@ -38,6 +38,7 @@ public class ShaderProgram {
     public void createUniform(String uniformName) throws Exception {
         int uniformLocation = glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
+            DebugUtils.listAllUniforms(programId);
             throw new Exception("Could not find the uniform '" + uniformName + "'");
         }
 
@@ -65,6 +66,7 @@ public class ShaderProgram {
         createUniform(uniformName + ".specular");
         createUniform(uniformName + ".hasTexture");
         createUniform(uniformName + ".reflectance");
+        createUniform(uniformName + ".hasNormalMap");
     }
 
     public void createSpotLightUniform(String uniformName) throws Exception {
@@ -146,6 +148,7 @@ public class ShaderProgram {
         setUniform(uniformName + ".specular", material.getSpecularColor());
         setUniform(uniformName + ".hasTexture", material.isTextured() ? 1 : 0);
         setUniform(uniformName + ".reflectance", material.getReflectance());
+        setUniform(uniformName + ".hasNormalMap", material.hasNormalMap() ? 1 : 0);
     }
 
     public void setUniform(String uniformName, PointLight[] pointLights) {

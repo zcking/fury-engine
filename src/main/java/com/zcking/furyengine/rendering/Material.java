@@ -17,6 +17,8 @@ public class Material {
 
     private Texture texture;
 
+    private Texture normalMap;
+
     public Material() {
         this.ambientColor = DEFAULT_COLOR;
         this.diffuseColor = DEFAULT_COLOR;
@@ -89,4 +91,13 @@ public class Material {
         this.texture = texture;
     }
 
+    public boolean hasNormalMap() {
+        return this.normalMap != null;
+    }
+
+    public Texture getNormalMap() { return this.normalMap; }
+
+    public void setNormalMap(Texture normalMap) {
+        this.normalMap = normalMap;
+    }
 }

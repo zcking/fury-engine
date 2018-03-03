@@ -46,6 +46,7 @@ public class Renderer {
     private static final String UNIFORM_DIRECTIONAL_LIGHT = "directionalLight";
     private static final String UNIFORM_SPOT_LIGHTS = "spotLights";
     private static final String UNIFORM_FOG = "fog";
+    private static final String UNIFORM_NORMAL_MAP = "normalMap";
 
     // HUD shader uniforms
     private static final String UNIFORM_HUD_PROJ_MODEL_MATRIX = "projModelMatrix";
@@ -83,6 +84,7 @@ public class Renderer {
         sceneShaderProgram.createUniform(UNIFORM_PROJECTION_MATRIX);
         sceneShaderProgram.createUniform(UNIFORM_MODEL_VIEW_MATRIX);
         sceneShaderProgram.createUniform(UNIFORM_TEXTURE_SAMPLER);
+        sceneShaderProgram.createUniform(UNIFORM_NORMAL_MAP);
         sceneShaderProgram.createMaterialUniform(UNIFORM_MATERIAL);
         sceneShaderProgram.createFogUniform(UNIFORM_FOG);
 
@@ -179,6 +181,7 @@ public class Renderer {
         renderLights(viewMatrix, sceneLight);
 
         sceneShaderProgram.setUniform(UNIFORM_TEXTURE_SAMPLER, 0);
+        sceneShaderProgram.setUniform(UNIFORM_NORMAL_MAP, 1);
         sceneShaderProgram.setUniform(UNIFORM_FOG, scene.getFog());
 
         // Render each mesh with the associated game objects
