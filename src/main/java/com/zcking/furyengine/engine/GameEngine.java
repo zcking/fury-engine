@@ -21,6 +21,7 @@ public class GameEngine implements Runnable {
         timer = new Timer();
     }
 
+    @Deprecated
     public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
         this(WindowSettings.create()
                 .withInitialWidth(width)
