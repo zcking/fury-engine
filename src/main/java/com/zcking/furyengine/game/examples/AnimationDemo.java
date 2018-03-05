@@ -1,9 +1,6 @@
 package com.zcking.furyengine.game.examples;
 
-import com.zcking.furyengine.engine.GameEngine;
-import com.zcking.furyengine.engine.IGameLogic;
-import com.zcking.furyengine.engine.Scene;
-import com.zcking.furyengine.engine.Window;
+import com.zcking.furyengine.engine.*;
 import com.zcking.furyengine.engine.loaders.md5.MD5Loader;
 import com.zcking.furyengine.engine.loaders.md5.MD5Model;
 import com.zcking.furyengine.engine.loaders.obj.OBJLoader;
@@ -186,9 +183,14 @@ public class AnimationDemo implements IGameLogic {
     {
         try {
             IGameLogic gameLogic = new AnimationDemo();
+            WindowSettings windowSettings = WindowSettings.create()
+                    .withCullingEnabled(false)
+                    .withInitialWidth(1444)
+                    .withInitialHeight(1024)
+                    .withStartMaximized(true)
+                    .withInitialTitle("Animation Demo");
             GameEngine engine = new GameEngine(
-                    "Animation Demo",
-                    600, 480, true,
+                    windowSettings,
                     gameLogic
             );
             engine.start();
