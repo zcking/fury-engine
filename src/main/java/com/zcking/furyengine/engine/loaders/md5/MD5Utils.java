@@ -22,4 +22,15 @@ public class MD5Utils {
         return orientation;
     }
 
+    public static Quaternionf calculateQuaternion(float x, float y, float z) {
+        Quaternionf orientation = new Quaternionf(x, y, z, 0);
+        float temp = 1.0f - (orientation.x * orientation.x) - (orientation.y * orientation.y) - (orientation.z * orientation.z);
+        if (temp < 0) {
+            orientation.w = 0;
+        } else {
+            orientation.w = -(float) (Math.sqrt(temp));
+        }
+        return orientation;
+    }
+
 }
