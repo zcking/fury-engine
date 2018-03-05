@@ -14,7 +14,7 @@ public class Main
             // Instantiate any demo here
             IGameLogic gameLogic = new NormalsDemo();
 
-            // Settings for the game windoow
+            // Settings for the game window
             WindowSettings windowSettings = WindowSettings.create()
                     .withInitialHeight(480)
                     .withInitialWidth(600)
