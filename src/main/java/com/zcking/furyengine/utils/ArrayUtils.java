@@ -13,4 +13,9 @@ public class ArrayUtils {
         return floatArr;
     }
 
+    public static int[] listIntToArray(List<Integer> list) {
+        int[] result = list.stream().mapToInt((Integer v) -> v).toArray();
+        return result;
+    }
+
 }

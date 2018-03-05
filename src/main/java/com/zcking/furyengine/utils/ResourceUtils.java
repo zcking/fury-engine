@@ -49,4 +49,14 @@ public class ResourceUtils {
         return lines;
     }
 
+    public static boolean existsResourceFile(String fileName) {
+        boolean result;
+        try (InputStream is = ResourceUtils.class.getResourceAsStream(fileName ) ) {
+            result = is != null;
+        } catch (Exception excp) {
+            result = false;
+        }
+        return result;
+    }
+
 }

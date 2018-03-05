@@ -1,4 +1,4 @@
-package com.zcking.furyengine.engine.graph;
+package com.zcking.furyengine.engine.loaders.obj;
 
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.utils.ResourceUtils;

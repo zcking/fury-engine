@@ -2,7 +2,7 @@ package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.*;
 import com.zcking.furyengine.engine.Window;
-import com.zcking.furyengine.engine.graph.OBJLoader;
+import com.zcking.furyengine.engine.loaders.obj.OBJLoader;
 import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.objects.TextItem;
 import com.zcking.furyengine.rendering.FontTexture;
