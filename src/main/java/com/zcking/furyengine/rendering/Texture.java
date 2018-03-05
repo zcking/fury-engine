@@ -5,6 +5,8 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBTTBakedChar;
+
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.stb.STBTruetype.*;
 
 import java.io.InputStream;
@@ -60,6 +62,26 @@ public class Texture {
         cData = null;
 
         this.id = textureId;
+    }
+
+    // For creating a blank texture
+    public Texture(int width, int height, int pixelFormat) throws Exception {
+        this.id = glGenTextures();
+        this.width = width;
+        this.height = height;
+        this.cData = null;
+
+        glBindTexture(GL_TEXTURE_2D, this.id);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this.width, this.height,
+                0, pixelFormat, GL_FLOAT, (ByteBuffer) null);
+
+        // Use nearest available pixel when sampling
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        // Don't repeat the texture
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
     protected Texture(int id, int width, int height, STBTTBakedChar.Buffer cData) {

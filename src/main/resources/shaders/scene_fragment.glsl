@@ -7,6 +7,7 @@ in vec2 outTexCoord;
 in vec3 mvVertexNormal;
 in vec3 mvVertexPos;
 in mat4 outModelViewMatrix;
+in vec4 mLightViewVertexPos;
 
 out vec4 fragColor;
 
@@ -53,6 +54,7 @@ struct Fog {
 
 uniform sampler2D textureSampler;
 uniform sampler2D normalMap;
+uniform sampler2D shadowMap;
 uniform vec3 ambientLight;
 uniform float specularPower;
 uniform Material material;
@@ -150,6 +152,33 @@ vec3 calcNormal(Material material, vec3 normal, vec2 textCoord, mat4 modelViewMa
     return newNormal;
 }
 
+float calcShadow(vec4 position) {
+    // TODO: research how to fix the "peter panning" effect caused by the bias
+
+    // TODO: research how to calculate shadows based on multiple light sources (e.g. new depth map per light source)
+    vec3 projCoords = position.xyz;
+    projCoords = projCoords * 0.5 + 0.5;
+    float bias = 0.05;
+
+    float shadowFactor = 0.0;
+    vec2 inc = 1.0 / textureSize(shadowMap, 0);
+    for (int row = -1; row <= 1; ++row) {
+        for (int col = -1; col <= 1; ++col) {
+            float texDepth = texture(shadowMap, projCoords.xy + vec2(row, col) * inc).r;
+            shadowFactor += projCoords.z - bias > texDepth ? 1.0 : 0.0;
+        }
+    }
+    shadowFactor /= 9.0;
+
+    // Tranform screen coords to texture coords
+    if (projCoords.z > 1.0) {
+        // Current fragment is not in the shade
+        shadowFactor = 1.0;
+    }
+
+    return 1 - shadowFactor;
+}
+
 void main() {
     setupColors(material, outTexCoord);
 
@@ -169,7 +198,8 @@ void main() {
         }
     }
 
-    fragColor = ambientC * vec4(ambientLight, 1) + diffuseSpecularComp;
+    float shadow = calcShadow(mLightViewVertexPos);
+    fragColor = clamp(ambientC * vec4(ambientLight, 1) + diffuseSpecularComp * shadow, 0, 1);
 
     if (fog.enabled == 1) {
         fragColor = calcFog(mvVertexPos, fragColor, fog, ambientLight, directionalLight);
