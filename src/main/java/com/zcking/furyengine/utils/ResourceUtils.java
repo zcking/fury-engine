@@ -7,11 +7,10 @@ import java.util.Scanner;
 
 public class ResourceUtils {
 
-    public static String loadResource(String filePath) throws Exception {
+    public static String loadResource(String fileName) throws Exception {
         String result;
-        try (InputStream in = Class.forName(ResourceUtils.class.getName()).getResourceAsStream(filePath);
-            Scanner scanner = new Scanner(in, "UTF-8")) {
-
+        try (InputStream in = Class.forName(ResourceUtils.class.getName()).getResourceAsStream(fileName);
+             Scanner scanner = new Scanner(in, "UTF-8")) {
             result = scanner.useDelimiter("\\A").next();
         }
         return result;
@@ -36,22 +35,23 @@ public class ResourceUtils {
     }
 
     public static List<String> readLines(String fileName) throws Exception {
-        List<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(Class.forName(
-                ResourceUtils.class.getName()
-        ).getResourceAsStream(fileName)))) {
+        return readAllLines(fileName);
+    }
+
+    public static List<String> readAllLines(String fileName) throws Exception {
+        List<String> list = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(Class.forName(ResourceUtils.class.getName()).getResourceAsStream(fileName)))) {
             String line;
             while ((line = br.readLine()) != null) {
-                lines.add(line);
+                list.add(line);
             }
         }
-
-        return lines;
+        return list;
     }
 
     public static boolean existsResourceFile(String fileName) {
         boolean result;
-        try (InputStream is = ResourceUtils.class.getResourceAsStream(fileName ) ) {
+        try (InputStream is = ResourceUtils.class.getResourceAsStream(fileName)) {
             result = is != null;
         } catch (Exception excp) {
             result = false;

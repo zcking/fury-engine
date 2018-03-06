@@ -9,9 +9,9 @@ layout (location = 2) in vec3 vertexNormal;
 layout (location = 3) in vec4 jointWeights;
 layout (location = 4) in ivec4 jointIndices;
 
-uniform mat4 modelLightViewMatrix;  // analogous to view model matrix for a camera
-uniform mat4 orthoProjectionMatrix; // for point lights this would be a perspective PM
 uniform mat4 jointsMatrix[MAX_JOINTS];
+uniform mat4 modelLightViewMatrix;
+uniform mat4 orthoProjectionMatrix;
 
 void main() {
     vec4 initPos = vec4(0, 0, 0, 0);

@@ -25,9 +25,11 @@ public class Mesh {
     public static final int MAX_WEIGHTS = 4;
 
     private final int vaoId;
+
+    protected final List<Integer> vboIdList;
+
     private final int vertexCount;
 
-    private final List<Integer> vboIdList;
     private Material material;
 
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
@@ -125,19 +127,35 @@ public class Mesh {
         }
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
+    public final int getVaoId() {
+        return vaoId;
+    }
+
+    public int getVertexCount() {
+        return vertexCount;
+    }
+
     private void initRender() {
         Texture texture = material.getTexture();
         if (texture != null) {
-            // Activate the first texture bank
+            // Activate first texture bank
             glActiveTexture(GL_TEXTURE0);
-
             // Bind the texture
             glBindTexture(GL_TEXTURE_2D, texture.getId());
         }
-
         Texture normalMap = material.getNormalMap();
-        if (normalMap != null) {
+        if ( normalMap != null ) {
+            // Activate first texture bank
             glActiveTexture(GL_TEXTURE1);
+            // Bind the texture
             glBindTexture(GL_TEXTURE_2D, normalMap.getId());
         }
 
@@ -162,25 +180,11 @@ public class Mesh {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    public Material getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(Material material) {
-        this.material = material;
-    }
-
-    public int getVaoId() {
-        return vaoId;
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
     public void render() {
         initRender();
+
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+
         endRender();
     }
 
@@ -188,7 +192,9 @@ public class Mesh {
         initRender();
 
         for (GameObject gameObject : gameObjects) {
+            // Set up data required by gameObject
             consumer.accept(gameObject);
+            // Render this game object
             glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
         }
 
@@ -204,9 +210,9 @@ public class Mesh {
             glDeleteBuffers(vboId);
         }
 
+        // Delete the texture
         Texture texture = material.getTexture();
         if (texture != null) {
-            // Delete the texture
             texture.cleanUp();
         }
 

@@ -16,7 +16,7 @@ public class MD5Model {
     public MD5Model() {
         meshes = new ArrayList<>();
     }
-
+    
     public MD5JointInfo getJointInfo() {
         return jointInfo;
     }
@@ -46,7 +46,7 @@ public class MD5Model {
         StringBuilder str = new StringBuilder("MD5MeshModel: " + System.lineSeparator());
         str.append(getHeader()).append(System.lineSeparator());
         str.append(getJointInfo()).append(System.lineSeparator());
-
+        
         for (MD5Mesh mesh : meshes) {
             str.append(mesh).append(System.lineSeparator());
         }
@@ -112,4 +112,5 @@ public class MD5Model {
                 break;
         }
     }
+
 }

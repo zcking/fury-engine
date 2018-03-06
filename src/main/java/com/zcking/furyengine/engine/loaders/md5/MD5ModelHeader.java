@@ -1,6 +1,5 @@
 package com.zcking.furyengine.engine.loaders.md5;
 
-import java.nio.IntBuffer;
 import java.util.List;
 
 public class MD5ModelHeader {
@@ -44,7 +43,7 @@ public class MD5ModelHeader {
     public void setNumMeshes(int numMeshes) {
         this.numMeshes = numMeshes;
     }
-
+    
     @Override
     public String toString() {
         return "[version: " + version + ", commandLine: " + commandLine +
@@ -87,6 +86,6 @@ public class MD5ModelHeader {
             }
         }
 
-        return header;
-    }
+        return header;        
+    }    
 }

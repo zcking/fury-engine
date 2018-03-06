@@ -119,5 +119,4 @@ public class MD5JointInfo {
             return result;
         }
     }
-
 }

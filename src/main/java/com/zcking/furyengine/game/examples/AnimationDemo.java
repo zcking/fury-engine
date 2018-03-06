@@ -35,7 +35,7 @@ public class AnimationDemo implements IGameLogic {
 
     private Scene scene;
 
-    private Hud hud;
+    private SimpleHud hud;
 
     private static final float CAMERA_POS_STEP = 0.05f;
 
@@ -71,14 +71,15 @@ public class AnimationDemo implements IGameLogic {
         quadGameItem.setScale(2.5f);
 
         // Setup  GameItems
-        MD5Model md5Meshodel = MD5Model.parse("/models/monster.md5mesh");
+        MD5Model md5MeshModel = MD5Model.parse("/models/monster.md5mesh");
         MD5AnimModel md5AnimModel = MD5AnimModel.parse("/models/monster.md5anim");
-        //MD5Model md5Meshodel = MD5Model.parse("/models/boblamp.md5mesh");
+        //MD5Model md5MeshModel = MD5Model.parse("/models/boblamp.md5mesh");
         //MD5AnimModel md5AnimModel = MD5AnimModel.parse("/models/boblamp.md5anim");
 
-        monster = MD5Loader.process(md5Meshodel, md5AnimModel, new Vector4f(1, 1, 1, 1));
+        monster = MD5Loader.process(md5MeshModel, md5AnimModel, new Vector4f(1, 1, 1, 1));
         monster.setScale(0.05f);
-        monster.setRotation(90, 0, 0);
+        monster.setRotation(90, 0, 90);
+        //monster.setRotation(90, 0, 0);
 
         scene.setGameObjects(new GameObject[] { quadGameItem, monster} );
 
@@ -90,7 +91,7 @@ public class AnimationDemo implements IGameLogic {
         camera.getPosition().z = 6.5f;
         camera.getRotation().x = 25;
         camera.getRotation().y = -1;
-        hud = new Hud("");
+        hud = new SimpleHud("");
     }
 
     private void setupLights() {
@@ -105,7 +106,7 @@ public class AnimationDemo implements IGameLogic {
         float lightIntensity = 1.0f;
         Vector3f lightDirection = new Vector3f(0, 1, 1);
         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), lightDirection, lightIntensity);
-        directionalLight.setShadowPosMult(5);
+        directionalLight.setShadowPosMult(10);
         directionalLight.setOrthoCoords(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 20.0f);
         sceneLight.setDirectionalLight(directionalLight);
     }

@@ -52,6 +52,6 @@ void main()
     // The W component of the normal is set to zero beforehand because translation isn't needed
     mvVertexNormal = normalize(modelViewMatrix * initNormal).xyz;
     mvVertexPos = mvPos.xyz;
-    mLightViewVertexPos = orthoProjectionMatrix * modelLightViewMatrix * vec4(position, 1.0);
+    mLightViewVertexPos = orthoProjectionMatrix * modelLightViewMatrix * initPos;
     outModelViewMatrix = modelViewMatrix;
 }

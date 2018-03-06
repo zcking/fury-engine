@@ -67,5 +67,4 @@ public class MD5Frame {
         }
         return data;
     }
-
 }

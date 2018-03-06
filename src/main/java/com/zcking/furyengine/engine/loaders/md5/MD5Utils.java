@@ -26,5 +26,4 @@ public class MD5Utils {
         }
         return orientation;
     }
-
 }

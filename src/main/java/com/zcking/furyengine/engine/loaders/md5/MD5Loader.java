@@ -259,5 +259,4 @@ public class MD5Loader {
             mesh.setMaterial(new Material(defaultColour, 1));
         }
     }
-
 }

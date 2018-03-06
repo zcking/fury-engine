@@ -244,13 +244,13 @@ public class MD5Mesh {
     }
 
     public static class MD5Weight {
-
+        
         private int index;
-
+        
         private int jointIndex;
-
+        
         private float bias;
-
+        
         private Vector3f position;
 
         public int getIndex() {
@@ -291,5 +291,4 @@ public class MD5Mesh {
                     + ", bias: " + bias + ", position: " + position + "]";
         }
     }
-
 }

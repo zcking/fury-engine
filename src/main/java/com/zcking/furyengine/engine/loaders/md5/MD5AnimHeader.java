@@ -3,7 +3,7 @@ package com.zcking.furyengine.engine.loaders.md5;
 import java.util.List;
 
 public class MD5AnimHeader {
-
+    
     private String version;
 
     private String commandLine;
@@ -63,7 +63,7 @@ public class MD5AnimHeader {
     public void setNumAnimatedComponents(int numAnimatedComponents) {
         this.numAnimatedComponents = numAnimatedComponents;
     }
-
+    
     @Override
     public String toString() {
         return "animHeader: [version: " + version + ", commandLine: " + commandLine +
@@ -73,7 +73,7 @@ public class MD5AnimHeader {
 
     public static MD5AnimHeader parse(List<String> lines) throws Exception  {
         MD5AnimHeader header = new MD5AnimHeader();
-
+        
         int numLines = lines != null ? lines.size() : 0;
         if (numLines == 0) {
             throw new Exception("Cannot parse empty file");
@@ -115,5 +115,4 @@ public class MD5AnimHeader {
         }
         return header;
     }
-
 }

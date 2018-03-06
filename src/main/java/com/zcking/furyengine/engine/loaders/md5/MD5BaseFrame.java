@@ -94,5 +94,4 @@ public class MD5BaseFrame {
             return result;
         }
     }
-
 }

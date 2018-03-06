@@ -142,5 +142,4 @@ public class MD5AnimModel {
                 break;
         }
     }
-
 }
