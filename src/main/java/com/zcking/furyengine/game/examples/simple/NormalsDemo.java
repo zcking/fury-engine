@@ -1,12 +1,8 @@
 package com.zcking.furyengine.game.examples.simple;
 
-import com.zcking.furyengine.engine.IGameLogic;
-import com.zcking.furyengine.engine.Scene;
-import com.zcking.furyengine.engine.Window;
-import com.zcking.furyengine.engine.graph.OBJLoader;
+import com.zcking.furyengine.engine.*;
+import com.zcking.furyengine.engine.loaders.obj.OBJLoader;
 import com.zcking.furyengine.engine.objects.GameObject;
-import com.zcking.furyengine.engine.objects.SkyBox;
-import com.zcking.furyengine.engine.objects.Terrain;
 import com.zcking.furyengine.game.Hud;
 import com.zcking.furyengine.game.Renderer;
 import com.zcking.furyengine.input.MouseInput;
@@ -16,7 +12,6 @@ import com.zcking.furyengine.rendering.Camera;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.Texture;
-import com.zcking.furyengine.rendering.weather.Fog;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -166,6 +161,24 @@ public class NormalsDemo implements IGameLogic {
         scene.cleanUp();
         if (hud != null) {
             hud.cleanUp();
+        }
+    }
+
+    public static void main( String[] args )
+    {
+        try {
+            IGameLogic gameLogic = new NormalsDemo();
+            WindowSettings windowSettings = WindowSettings.create()
+                    .withInitialTitle("Normals Demo")
+                    .withInitialWidth(600)
+                    .withInitialHeight(480)
+                    .withStartMaximized(true)
+                    .withVSyncEnabled(true);
+            GameEngine engine = new GameEngine(windowSettings, gameLogic);
+            engine.start();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(-1);
         }
     }
 

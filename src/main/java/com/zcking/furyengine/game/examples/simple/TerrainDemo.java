@@ -1,8 +1,6 @@
 package com.zcking.furyengine.game.examples.simple;
 
-import com.zcking.furyengine.engine.IGameLogic;
-import com.zcking.furyengine.engine.Scene;
-import com.zcking.furyengine.engine.Window;
+import com.zcking.furyengine.engine.*;
 import com.zcking.furyengine.engine.objects.SkyBox;
 import com.zcking.furyengine.engine.objects.Terrain;
 import com.zcking.furyengine.game.Hud;
@@ -140,33 +138,6 @@ public class TerrainDemo implements IGameLogic {
         if ( camera.getPosition().y <= height )  {
             camera.setPosition(prevPos.x, prevPos.y, prevPos.z);
         }
-
-        // Update directional light direction, intensity and color
-//        SceneLight sceneLight = scene.getSceneLight();
-//        DirectionalLight directionalLight = sceneLight.getDirectionalLight();
-//        lightAngle += 0.5f;
-//        if (lightAngle > 90) {
-//            directionalLight.setIntensity(0);
-//            if (lightAngle >= 360) {
-//                lightAngle = -90;
-//            }
-//            sceneLight.getSkyBoxLight().set(0.3f, 0.3f, 0.3f);
-//        } else if (lightAngle <= -80 || lightAngle >= 80) {
-//            float factor = 1 - (float) (Math.abs(lightAngle) - 80) / 10.0f;
-//            sceneLight.getSkyBoxLight().set(factor, factor, factor);
-//            directionalLight.setIntensity(factor);
-//            directionalLight.getColor().y = Math.max(factor, 0.9f);
-//            directionalLight.getColor().z = Math.max(factor, 0.5f);
-//        } else {
-//            sceneLight.getSkyBoxLight().set(1.0f, 1.0f, 1.0f);
-//            directionalLight.setIntensity(1);
-//            directionalLight.getColor().x = 1;
-//            directionalLight.getColor().y = 1;
-//            directionalLight.getColor().z = 1;
-//        }
-//        double angRad = Math.toRadians(lightAngle);
-//        directionalLight.getDirection().x = (float) Math.sin(angRad);
-//        directionalLight.getDirection().y = (float) Math.cos(angRad);
     }
 
     @Override
@@ -180,6 +151,24 @@ public class TerrainDemo implements IGameLogic {
         renderer.cleanUp();
         scene.cleanUp();
         hud.cleanUp();
+    }
+
+    public static void main( String[] args )
+    {
+        try {
+            IGameLogic gameLogic = new TerrainDemo();
+            WindowSettings windowSettings = WindowSettings.create()
+                    .withInitialTitle("Terrain Demo")
+                    .withInitialWidth(600)
+                    .withInitialHeight(480)
+                    .withStartMaximized(true)
+                    .withVSyncEnabled(true);
+            GameEngine engine = new GameEngine(windowSettings, gameLogic);
+            engine.start();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(-1);
+        }
     }
 
 }

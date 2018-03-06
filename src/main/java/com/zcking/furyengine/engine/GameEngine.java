@@ -13,12 +13,22 @@ public class GameEngine implements Runnable {
     private final IGameLogic gameLogic;
     private final MouseInput mouseInput;
 
-    public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
+    public GameEngine(WindowSettings windowSettings, IGameLogic gameLogic) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
-        window = new Window(windowTitle, width, height, vSync);
+        window = new Window(windowSettings);
         mouseInput = new MouseInput();
         this.gameLogic = gameLogic;
         timer = new Timer();
+    }
+
+    @Deprecated
+    public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
+        this(WindowSettings.create()
+                .withInitialWidth(width)
+                .withInitialHeight(height)
+                .withVSyncEnabled(vSync)
+                .withInitialTitle(windowTitle),
+            gameLogic);
     }
 
     public void start() {

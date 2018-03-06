@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 
 public class GameObject {
 
-    private Mesh mesh;
+    private Mesh[] meshes;
 
     private final Vector3f position;
 
@@ -21,7 +21,12 @@ public class GameObject {
 
     public GameObject(Mesh mesh) {
         this();
-        this.mesh = mesh;
+        this.meshes = new Mesh[]{mesh};
+    }
+
+    public GameObject(Mesh[] meshes) {
+        this();
+        this.meshes = meshes;
     }
 
     public Vector3f getPosition() {
@@ -53,10 +58,23 @@ public class GameObject {
     }
 
     public Mesh getMesh() {
-        return mesh;
+        return meshes[0];
     }
 
     public void setMesh(Mesh mesh) {
-        this.mesh = mesh;
+        if (this.meshes != null) {
+            for (Mesh m : meshes) {
+                m.cleanUp();
+            }
+        }
+        this.meshes = new Mesh[]{mesh};
+    }
+
+    public Mesh[] getMeshes() {
+        return meshes;
+    }
+
+    public void setMeshes(Mesh[] meshes) {
+        this.meshes = meshes;
     }
 }

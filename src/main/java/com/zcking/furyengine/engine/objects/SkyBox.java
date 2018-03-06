@@ -1,7 +1,6 @@
 package com.zcking.furyengine.engine.objects;
 
-import com.zcking.furyengine.engine.objects.GameObject;
-import com.zcking.furyengine.engine.graph.OBJLoader;
+import com.zcking.furyengine.engine.loaders.obj.OBJLoader;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.Texture;
