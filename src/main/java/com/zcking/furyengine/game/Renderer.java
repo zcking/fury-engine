@@ -78,6 +78,7 @@ public class Renderer {
     // Depth shader uniforms
     private static final String UNIFORM_DEPTH_ORTHO_MAT = "orthoProjectionMatrix";
     private static final String UNIFORM_DEPTH_MODEL_MAT = "modelLightViewMatrix";
+    private static final String UNIFORM_DEPTH_JOINTS_MATRIX = "jointsMatrix";
 
     private static final int MAX_SPOT_LIGHTS = 5; // make this the same as in the shader!
     private static final int MAX_POINT_LIGHTS = 5; // make this the same as in the shader!
@@ -124,6 +125,7 @@ public class Renderer {
 
         depthShaderProgram.createUniform(UNIFORM_DEPTH_ORTHO_MAT);
         depthShaderProgram.createUniform(UNIFORM_DEPTH_MODEL_MAT);
+        depthShaderProgram.createUniform(UNIFORM_DEPTH_JOINTS_MATRIX);
     }
 
     private void setupSceneShader() throws Exception {
@@ -354,6 +356,12 @@ public class Renderer {
             mesh.renderList(mapMeshes.get(mesh), (GameObject gameObject) -> {
                 Matrix4f modelLightViewMatrix = transformation.buildModelViewMatrix(gameObject, lightViewMatrix);
                 depthShaderProgram.setUniform(UNIFORM_DEPTH_MODEL_MAT, modelLightViewMatrix);
+
+                if (gameObject instanceof AnimGameObject) {
+                    AnimGameObject animGameObject = (AnimGameObject)gameObject;
+                    AnimatedFrame frame = animGameObject.getCurrentFrame();
+                    sceneShaderProgram.setUniform(UNIFORM_DEPTH_JOINTS_MATRIX, frame.getJointMatrices());
+                }
             });
         }
 
