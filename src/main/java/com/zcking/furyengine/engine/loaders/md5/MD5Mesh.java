@@ -10,13 +10,10 @@ import java.util.regex.Pattern;
 
 public class MD5Mesh {
 
-    private static final Pattern PATTERN_SHADER = Pattern.compile("\\s*shader\\s*\"([^\"]+)\"");
+    private static final Pattern PATTERN_SHADER = Pattern.compile("\\s*shader\\s*\\\"([^\\\"]+)\\\"");
 
-    private static final Pattern PATTERN_VERTEX = Pattern.compile(
-            "\\s*vert\\s*(\\d+)\\s*\\(\\s*("
-            + MD5Utils.FLOAT_REGEXP + ")\\s*(" + MD5Utils.FLOAT_REGEXP
-            + ")\\s*\\)\\s*(\\d+)\\s*(\\d+)"
-    );
+    private static final Pattern PATTERN_VERTEX = Pattern.compile("\\s*vert\\s*(\\d+)\\s*\\(\\s*("
+            + MD5Utils.FLOAT_REGEXP + ")\\s*(" + MD5Utils.FLOAT_REGEXP + ")\\s*\\)\\s*(\\d+)\\s*(\\d+)");
 
     private static final Pattern PATTERN_TRI = Pattern.compile("\\s*tri\\s*(\\d+)\\s*(\\d+)\\s*(\\d+)\\s*(\\d+)");
 

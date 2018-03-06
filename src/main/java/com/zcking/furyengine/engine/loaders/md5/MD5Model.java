@@ -63,24 +63,22 @@ public class MD5Model {
             throw new Exception("Cannot parse empty file");
         }
 
-        // Parse header
-        boolean headerEnded = false;
+        // Parse Header
+        boolean headerEnd = false;
         int start = 0;
-        for (int i = 0; i < numLines && !headerEnded; i++) {
+        for (int i = 0; i < numLines && !headerEnd; i++) {
             String line = lines.get(i);
-            headerEnded = line.trim().endsWith("{");
+            headerEnd = line.trim().endsWith("{");
             start = i;
         }
-
-        if (!headerEnded) {
+        if (!headerEnd) {
             throw new Exception("Cannot find header");
         }
-
         List<String> headerBlock = lines.subList(0, start);
         MD5ModelHeader header = MD5ModelHeader.parse(headerBlock);
         result.setHeader(header);
 
-        // Parse the rest
+        // Parse the rest of block
         int blockStart = 0;
         boolean inBlock = false;
         String blockId = "";
@@ -106,12 +104,10 @@ public class MD5Model {
                 MD5JointInfo jointInfo = MD5JointInfo.parse(blockBody);
                 model.setJointInfo(jointInfo);
                 break;
-
             case "mesh":
                 MD5Mesh md5Mesh = MD5Mesh.parse(blockBody);
                 model.getMeshes().add(md5Mesh);
                 break;
-
             default:
                 break;
         }

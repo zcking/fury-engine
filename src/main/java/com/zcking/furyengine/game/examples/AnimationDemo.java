@@ -1,9 +1,11 @@
 package com.zcking.furyengine.game.examples;
 
 import com.zcking.furyengine.engine.*;
+import com.zcking.furyengine.engine.loaders.md5.MD5AnimModel;
 import com.zcking.furyengine.engine.loaders.md5.MD5Loader;
 import com.zcking.furyengine.engine.loaders.md5.MD5Model;
 import com.zcking.furyengine.engine.loaders.obj.OBJLoader;
+import com.zcking.furyengine.engine.objects.AnimGameObject;
 import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.objects.Terrain;
 import com.zcking.furyengine.game.Hud;
@@ -43,6 +45,8 @@ public class AnimationDemo implements IGameLogic {
 
     private float lightAngle;
 
+    private AnimGameObject monster;
+
     public AnimationDemo() {
         renderer = new Renderer();
         camera = new Camera();
@@ -60,7 +64,7 @@ public class AnimationDemo implements IGameLogic {
         float reflectance = 1f;
 
         Mesh quadMesh = OBJLoader.loadMesh("/models/plane.obj");
-        Material quadMaterial = new Material(new Vector4f(0.0f, 0.0f, 1.0f, 1.0f), reflectance);
+        Material quadMaterial = new Material(new Vector4f(0.0f, 0.0f, 1.0f, 1.f), reflectance);
         quadMesh.setMaterial(quadMaterial);
         GameObject quadGameItem = new GameObject(quadMesh);
         quadGameItem.setPosition(0, 0, 0);
@@ -68,7 +72,11 @@ public class AnimationDemo implements IGameLogic {
 
         // Setup  GameItems
         MD5Model md5Meshodel = MD5Model.parse("/models/monster.md5mesh");
-        GameObject monster = MD5Loader.process(md5Meshodel, new Vector4f(1, 1, 1, 1));
+        MD5AnimModel md5AnimModel = MD5AnimModel.parse("/models/monster.md5anim");
+        //MD5Model md5Meshodel = MD5Model.parse("/models/boblamp.md5mesh");
+        //MD5AnimModel md5AnimModel = MD5AnimModel.parse("/models/boblamp.md5anim");
+
+        monster = MD5Loader.process(md5Meshodel, md5AnimModel, new Vector4f(1, 1, 1, 1));
         monster.setScale(0.05f);
         monster.setRotation(90, 0, 0);
 
@@ -126,6 +134,9 @@ public class AnimationDemo implements IGameLogic {
             angleInc += 0.05f;
         } else {
             angleInc = 0;
+        }
+        if (window.isKeyPressed(GLFW_KEY_SPACE) ) {
+            monster.nextFrame();
         }
     }
 

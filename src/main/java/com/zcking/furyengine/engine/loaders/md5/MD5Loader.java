@@ -3,7 +3,6 @@ package com.zcking.furyengine.engine.loaders.md5;
 import com.zcking.furyengine.engine.graph.animation.AnimVertex;
 import com.zcking.furyengine.engine.graph.animation.AnimatedFrame;
 import com.zcking.furyengine.engine.objects.AnimGameObject;
-import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.Texture;
@@ -24,16 +23,23 @@ import java.util.List;
  */
 public class MD5Loader {
 
-    private static final String NORMAL_FILE_SUFFIX = "_normal";
-
-    public static AnimGameObject process(MD5Model md5Model, MD5AnimModel animModel, Vector4f defaultColor) throws Exception {
+    /**
+     * Constructs and AnimGameObject instance based on a MD5 Model an MD5 Animation
+     *
+     * @param md5Model The MD5 Model
+     * @param animModel The MD5 Animation
+     * @param defaultColour Default colour to use if there are no textures
+     * @return A new AnimGameObject
+     * @throws Exception If an error occurs
+     */
+    public static AnimGameObject process(MD5Model md5Model, MD5AnimModel animModel, Vector4f defaultColour) throws Exception {
         List<Matrix4f> invJointMatrices = calcInvJointMatrices(md5Model);
         List<AnimatedFrame> animatedFrames = processAnimationFrames(md5Model, animModel, invJointMatrices);
 
         List<Mesh> list = new ArrayList<>();
         for (MD5Mesh md5Mesh : md5Model.getMeshes()) {
             Mesh mesh = generateMesh(md5Model, md5Mesh);
-            handleTexture(mesh, md5Mesh, defaultColor);
+            handleTexture(mesh, md5Mesh, defaultColour);
             list.add(mesh);
         }
 
@@ -120,51 +126,7 @@ public class MD5Loader {
             v.normal.normalize();
         }
 
-        Mesh mesh = createMesh(vertices, indices);
-        return mesh;
-    }
-
-    private static Mesh createMesh(List<AnimVertex> vertices, List<Integer> indices) {
-        List<Float> positions = new ArrayList<>();
-        List<Float> textCoords = new ArrayList<>();
-        List<Float> normals = new ArrayList<>();
-        List<Integer> jointIndices = new ArrayList<>();
-        List<Float> weights = new ArrayList<>();
-
-        for (AnimVertex vertex : vertices) {
-            positions.add(vertex.position.x);
-            positions.add(vertex.position.y);
-            positions.add(vertex.position.z);
-
-            textCoords.add(vertex.textCoords.x);
-            textCoords.add(vertex.textCoords.y);
-
-            normals.add(vertex.normal.x);
-            normals.add(vertex.normal.y);
-            normals.add(vertex.normal.z);
-
-            int numWeights = vertex.weights.length;
-            for (int i = 0; i < Mesh.MAX_WEIGHTS; i++) {
-                if (i < numWeights) {
-                    jointIndices.add(vertex.jointIndices[i]);
-                    weights.add(vertex.weights[i]);
-                } else {
-                    jointIndices.add(-1);
-                    weights.add(-1.0f);
-                }
-            }
-        }
-
-        float[] positionsArr = ArrayUtils.listToArray(positions);
-        float[] textCoordsArr = ArrayUtils.listToArray(textCoords);
-        float[] normalsArr = ArrayUtils.listToArray(normals);
-        int[] indicesArr = ArrayUtils.listIntToArray(indices);
-        int[] jointIndicesArr = ArrayUtils.listIntToArray(jointIndices);
-        float[] weightsArr = ArrayUtils.listToArray(weights);
-
-        Mesh result = new Mesh(positionsArr, textCoordsArr, normalsArr, indicesArr, jointIndicesArr, weightsArr);
-
-        return result;
+        return createMesh(vertices, indices);
     }
 
     private static List<AnimatedFrame> processAnimationFrames(MD5Model md5Model, MD5AnimModel animModel, List<Matrix4f> invJointMatrices) {
@@ -234,6 +196,47 @@ public class MD5Loader {
         return result;
     }
 
+    private static Mesh createMesh(List<AnimVertex> vertices, List<Integer> indices) {
+        List<Float> positions = new ArrayList<>();
+        List<Float> textCoords = new ArrayList<>();
+        List<Float> normals = new ArrayList<>();
+        List<Integer> jointIndices = new ArrayList<>();
+        List<Float> weights = new ArrayList<>();
+
+        for (AnimVertex vertex : vertices) {
+            positions.add(vertex.position.x);
+            positions.add(vertex.position.y);
+            positions.add(vertex.position.z);
+
+            textCoords.add(vertex.textCoords.x);
+            textCoords.add(vertex.textCoords.y);
+
+            normals.add(vertex.normal.x);
+            normals.add(vertex.normal.y);
+            normals.add(vertex.normal.z);
+
+            int numWeights = vertex.weights.length;
+            for (int i = 0; i < Mesh.MAX_WEIGHTS; i++) {
+                if (i < numWeights) {
+                    jointIndices.add(vertex.jointIndices[i]);
+                    weights.add(vertex.weights[i]);
+                } else {
+                    jointIndices.add(-1);
+                    weights.add(-1.0f);
+                }
+            }
+        }
+
+        float[] positionsArr = ArrayUtils.listToArray(positions);
+        float[] textCoordsArr = ArrayUtils.listToArray(textCoords);
+        float[] normalsArr = ArrayUtils.listToArray(normals);
+        int[] indicesArr = ArrayUtils.listIntToArray(indices);
+        int[] jointIndicesArr = ArrayUtils.listIntToArray(jointIndices);
+        float[] weightsArr = ArrayUtils.listToArray(weights);
+
+        return new Mesh(positionsArr, textCoordsArr, normalsArr, indicesArr, jointIndicesArr, weightsArr);
+    }
+
     private static void handleTexture(Mesh mesh, MD5Mesh md5Mesh, Vector4f defaultColour) throws Exception {
         String texturePath = md5Mesh.getTexture();
         if (texturePath != null && texturePath.length() > 0) {
@@ -245,7 +248,7 @@ public class MD5Loader {
             if (pos > 0) {
                 String basePath = texturePath.substring(0, pos);
                 String extension = texturePath.substring(pos, texturePath.length());
-                String normalMapFileName = basePath + NORMAL_FILE_SUFFIX + extension;
+                String normalMapFileName = basePath + "_local" + extension;
                 if (ResourceUtils.existsResourceFile(normalMapFileName)) {
                     Texture normalMap = new Texture(normalMapFileName);
                     material.setNormalMap(normalMap);
@@ -254,49 +257,6 @@ public class MD5Loader {
             mesh.setMaterial(material);
         } else {
             mesh.setMaterial(new Material(defaultColour, 1));
-        }
-    }
-
-    private static class VertexInfo {
-
-        public Vector3f position;
-
-        public Vector3f normal;
-
-        public VertexInfo(Vector3f position) {
-            this.position = position;
-            normal = new Vector3f(0, 0, 0);
-        }
-
-        public VertexInfo() {
-            position = new Vector3f();
-            normal = new Vector3f();
-        }
-
-        public static float[] toPositionsArr(List<VertexInfo> list) {
-            int length = list != null ? list.size() * 3 : 0;
-            float[] result = new float[length];
-            int i = 0;
-            for (VertexInfo v : list) {
-                result[i] = v.position.x;
-                result[i + 1] = v.position.y;
-                result[i + 2] = v.position.z;
-                i += 3;
-            }
-            return result;
-        }
-
-        public static float[] toNormalArr(List<VertexInfo> list) {
-            int length = list != null ? list.size() * 3 : 0;
-            float[] result = new float[length];
-            int i = 0;
-            for (VertexInfo v : list) {
-                result[i] = v.normal.x;
-                result[i + 1] = v.normal.y;
-                result[i + 2] = v.normal.z;
-                i += 3;
-            }
-            return result;
         }
     }
 

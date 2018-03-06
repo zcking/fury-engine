@@ -58,8 +58,8 @@ public class MD5ModelHeader {
             throw new Exception("Cannot parse empty file");
         }
 
-        boolean finished = false;
-        for (int i = 0; i < numLines && !finished; i++) {
+        boolean finishHeader = false;
+        for (int i = 0; i < numLines && !finishHeader; i++) {
             String line = lines.get(i);
             String[] tokens = line.split("\\s+");
             int numTokens = tokens != null ? tokens.length : 0;
@@ -71,21 +71,17 @@ public class MD5ModelHeader {
                     case "MD5Version":
                         header.setVersion(paramValue);
                         break;
-
-                    case "commandLine":
+                    case "commandline":
                         header.setCommandLine(paramValue);
                         break;
-
                     case "numJoints":
                         header.setNumJoints(Integer.parseInt(paramValue));
                         break;
-
                     case "numMeshes":
                         header.setNumMeshes(Integer.parseInt(paramValue));
                         break;
-
                     case "joints":
-                        finished = true;
+                        finishHeader = true;
                         break;
                 }
             }

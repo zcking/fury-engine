@@ -39,7 +39,6 @@ public class MD5JointInfo {
                 joints.add(jointData);
             }
         }
-
         result.setJoints(joints);
         return result;
     }

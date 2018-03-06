@@ -3,6 +3,8 @@ package com.zcking.furyengine.game;
 import java.util.List;
 import java.util.Map;
 
+import com.zcking.furyengine.engine.graph.animation.AnimatedFrame;
+import com.zcking.furyengine.engine.objects.AnimGameObject;
 import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.IHud;
 import com.zcking.furyengine.engine.Scene;
@@ -60,6 +62,7 @@ public class Renderer {
     private static final String UNIFORM_MODEL_LV_MAT = "modelLightViewMatrix";
     private static final String UNIFORM_ORTHO_PROJ_MAT = "orthoProjectionMatrix";
     private static final String UNIFORM_SHADOW_MAP = "shadowMap";
+    private static final String UNIFORM_JOINTS_MATRIX = "jointsMatrix";
 
     // HUD shader uniforms
     private static final String UNIFORM_HUD_PROJ_MODEL_MATRIX = "projModelMatrix";
@@ -109,6 +112,8 @@ public class Renderer {
             renderSkyBox(window, camera, scene);
         if (hud != null)
             renderHud(window, hud);
+
+//        renderAxes(camera); // Todo: create RendererSettings to pass to Renderer class that contains this stuff?
     }
 
     private void setupDepthShader() throws Exception {
@@ -149,6 +154,9 @@ public class Renderer {
         sceneShaderProgram.createUniform(UNIFORM_SHADOW_MAP);
         sceneShaderProgram.createUniform(UNIFORM_ORTHO_PROJ_MAT);
         sceneShaderProgram.createUniform(UNIFORM_MODEL_LV_MAT);
+
+        // Joint matrices (for animation)
+        sceneShaderProgram.createUniform(UNIFORM_JOINTS_MATRIX);
     }
 
     private void setupHudShader() throws Exception {
@@ -235,6 +243,12 @@ public class Renderer {
 
                         Matrix4f modelLightViewMatrix = transformation.buildModelLightViewMatrix(gameObject, lightViewMatrix);
                         sceneShaderProgram.setUniform(UNIFORM_MODEL_LV_MAT, modelLightViewMatrix);
+
+                        if (gameObject instanceof AnimGameObject) {
+                            AnimGameObject animGameObject = (AnimGameObject)gameObject;
+                            AnimatedFrame frame = animGameObject.getCurrentFrame();
+                            sceneShaderProgram.setUniform(UNIFORM_JOINTS_MATRIX, frame.getJointMatrices());
+                        }
                     }
             );
         }
@@ -347,7 +361,46 @@ public class Renderer {
         glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
+    /**
+     * Renders the three axis in space (For debugging purposes only
+     * @param camera The Camera instance
+     */
+    private void renderAxes(Camera camera) {
+        glPushMatrix();
+        glLoadIdentity();
+        float rotX = camera.getRotation().x;
+        float rotY = camera.getRotation().y;
+        float rotZ = 0;
+        glRotatef(rotX, 1.0f, 0.0f, 0.0f);
+        glRotatef(rotY, 0.0f, 1.0f, 0.0f);
+        glRotatef(rotZ, 0.0f, 0.0f, 1.0f);
+        glLineWidth(2.0f);
+
+        glBegin(GL_LINES);
+        // X Axis
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(1.0f, 0.0f, 0.0f);
+        // Y Axis
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 1.0f, 0.0f);
+        // Z Axis
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f, 0.0f, 1.0f);
+        glEnd();
+
+        glPopMatrix();
+    }
+
     public void cleanUp() {
+        if (shadowMap != null) {
+            shadowMap.cleanUp();
+        }
+        if (depthShaderProgram != null) {
+            depthShaderProgram.cleanUp();
+        }
         if (skyBoxShaderProgram != null) {
             skyBoxShaderProgram.cleanUp();
         }
