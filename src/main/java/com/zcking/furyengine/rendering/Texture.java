@@ -18,6 +18,10 @@ public class Texture {
 
     private final int height;
 
+    private int numRows = 1;
+
+    private int numCols = 1;
+
     /**
      * Creates an empty texture.
      *
@@ -40,6 +44,12 @@ public class Texture {
 
     public Texture(String fileName) throws Exception {
         this(Texture.class.getResourceAsStream(fileName));
+    }
+
+    public Texture(String fileName, int numCols, int numRows) throws Exception  {
+        this(fileName);
+        this.numCols = numCols;
+        this.numRows = numRows;
     }
 
     public Texture(InputStream is) throws Exception {
@@ -97,5 +107,13 @@ public class Texture {
 
     public void cleanUp() {
         glDeleteTextures(id);
+    }
+
+    public int getNumRows() {
+        return numRows;
+    }
+
+    public int getNumCols() {
+        return numCols;
     }
 }
