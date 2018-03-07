@@ -1,9 +1,14 @@
 package com.zcking.furyengine.engine.objects;
 
 import com.zcking.furyengine.rendering.Mesh;
+import com.zcking.furyengine.rendering.Texture;
 import org.joml.Vector3f;
 
 public class Particle extends GameObject {
+
+    private long updateTextureMillis;
+
+    private long currentAnimTimeMillis;
 
     private Vector3f speed;
 
@@ -11,6 +16,18 @@ public class Particle extends GameObject {
      * Time to live for particle in milliseconds.
      */
     private long ttl;
+
+    private int animFrames;
+
+    public Particle(Mesh mesh, Vector3f speed, long ttl, long updateTextureMillis) {
+        super(mesh);
+        this.speed = new Vector3f(speed);
+        this.ttl = ttl;
+        this.updateTextureMillis = updateTextureMillis;
+        this.currentAnimTimeMillis = 0;
+        Texture texture = this.getMesh().getMaterial().getTexture();
+        this.animFrames = texture.getNumCols() * texture.getNumRows();
+    }
 
     public Particle(Mesh mesh, Vector3f speed, long ttl) {
         super(mesh);
@@ -26,18 +43,29 @@ public class Particle extends GameObject {
         setRotation(aux.x, aux.y, aux.z);
         setScale(baseParticle.getScale());
         this.speed = new Vector3f(baseParticle.speed);
-        this.ttl = baseParticle.getTtl();
+        this.ttl = baseParticle.geTtl();
+        this.updateTextureMillis = baseParticle.getUpdateTextureMillis();
+        this.currentAnimTimeMillis = 0;
+        this.animFrames = baseParticle.getAnimFrames();
+    }
+
+    public int getAnimFrames() {
+        return animFrames;
     }
 
     public Vector3f getSpeed() {
         return speed;
     }
 
+    public long getUpdateTextureMillis() {
+        return updateTextureMillis;
+    }
+
     public void setSpeed(Vector3f speed) {
         this.speed = speed;
     }
 
-    public long getTtl() {
+    public long geTtl() {
         return ttl;
     }
 
@@ -45,13 +73,28 @@ public class Particle extends GameObject {
         this.ttl = ttl;
     }
 
+    public void setUpdateTextureMills(long updateTextureMillis) {
+        this.updateTextureMillis = updateTextureMillis;
+    }
+
     /**
      * Updates the Particle's TTL
-     * @param elapsedTime Elapsed time in milliseconds
+     * @param elapsedTime Elapsed Time in milliseconds
      * @return The Particle's TTL
      */
     public long updateTtl(long elapsedTime) {
         this.ttl -= elapsedTime;
+        this.currentAnimTimeMillis += elapsedTime;
+        if ( this.currentAnimTimeMillis >= this.getUpdateTextureMillis() && this.animFrames > 0 ) {
+            this.currentAnimTimeMillis = 0;
+            int pos = this.getTextPos();
+            pos++;
+            if ( pos < this.animFrames ) {
+                this.setTextPos(pos);
+            } else {
+                this.setTextPos(0);
+            }
+        }
         return this.ttl;
     }
 }

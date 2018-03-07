@@ -15,11 +15,8 @@ import com.zcking.furyengine.lighting.DirectionalLight;
 import com.zcking.furyengine.lighting.PointLight;
 import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.lighting.SpotLight;
-import com.zcking.furyengine.rendering.Camera;
-import com.zcking.furyengine.rendering.Mesh;
-import com.zcking.furyengine.rendering.ShaderProgram;
+import com.zcking.furyengine.rendering.*;
 import com.zcking.furyengine.engine.objects.SkyBox;
-import com.zcking.furyengine.rendering.ShadowMap;
 import com.zcking.furyengine.utils.ResourceUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -97,6 +94,10 @@ public class Renderer {
     private static final String UNIFORM_PARTICLE_PROJ_MAT = "projectionMatrix";
     private static final String UNIFORM_PARTICLE_MODEL_VIEW_MAT = "modelViewMatrix";
     private static final String UNIFORM_PARTICLE_TEXTURE_SAMPLER = "textureSampler";
+    private static final String UNIFORM_PARCICLE_NUM_ROWS = "numRows";
+    private static final String UNIFORM_PARCICLE_NUM_COLS = "numCols";
+    private static final String UNIFORM_PARTICLE_TEX_XOFFSET = "texXOffset";
+    private static final String UNIFORM_PARTICLE_TEX_YOFFSET = "texYOffset";
 
     public Renderer() {
         transformation = new Transformation();
@@ -212,6 +213,10 @@ public class Renderer {
         particlesShaderProgram.createUniform(UNIFORM_PARTICLE_PROJ_MAT);
         particlesShaderProgram.createUniform(UNIFORM_PARTICLE_MODEL_VIEW_MAT);
         particlesShaderProgram.createUniform(UNIFORM_PARTICLE_TEXTURE_SAMPLER);
+        particlesShaderProgram.createUniform(UNIFORM_PARCICLE_NUM_ROWS);
+        particlesShaderProgram.createUniform(UNIFORM_PARCICLE_NUM_COLS);
+        particlesShaderProgram.createUniform(UNIFORM_PARTICLE_TEX_XOFFSET);
+        particlesShaderProgram.createUniform(UNIFORM_PARTICLE_TEX_YOFFSET);
     }
 
     public void clear() {
@@ -447,8 +452,25 @@ public class Renderer {
             IParticleEmitter emitter = emitters[i];
             Mesh mesh = emitter.getBaseParticle().getMesh();
 
+            Texture text = mesh.getMaterial().getTexture();
+            particlesShaderProgram.setUniform(UNIFORM_PARCICLE_NUM_ROWS, text.getNumRows());
+            particlesShaderProgram.setUniform(UNIFORM_PARCICLE_NUM_COLS, text.getNumCols());
+
             mesh.renderList(emitter.getParticles(), (GameObject gameObject) -> {
-                Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(gameObject, viewMatrix);
+                int col = gameObject.getTextPos() % text.getNumCols();
+                int row = gameObject.getTextPos() / text.getNumCols();
+                float textXOffset = (float) col / text.getNumCols();
+                float textYOffset = (float) row / text.getNumRows();
+                particlesShaderProgram.setUniform(UNIFORM_PARTICLE_TEX_XOFFSET, textXOffset);
+                particlesShaderProgram.setUniform(UNIFORM_PARTICLE_TEX_YOFFSET, textYOffset);
+
+                Matrix4f modelMatrix = transformation.buildModelMatrix(gameObject);
+
+                viewMatrix.transpose3x3(modelMatrix);
+                viewMatrix.scale(gameObject.getScale());
+
+                Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+                modelViewMatrix.scale(gameObject.getScale());
                 particlesShaderProgram.setUniform(UNIFORM_PARTICLE_MODEL_VIEW_MAT, modelViewMatrix);
             });
         }

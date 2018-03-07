@@ -28,6 +28,8 @@ public class FlowParticleEmitter implements IParticleEmitter {
 
     private float scaleRndRange;
 
+    private long animRange;
+
     public FlowParticleEmitter(Particle baseParticle, int maxParticles, long creationPeriodMillis) {
         particles = new ArrayList<>();
         this.baseParticle = baseParticle;
@@ -40,6 +42,10 @@ public class FlowParticleEmitter implements IParticleEmitter {
     @Override
     public Particle getBaseParticle() {
         return baseParticle;
+    }
+
+    public void setAnimRange(long animRange) {
+        this.animRange = animRange;
     }
 
     public long getCreationPeriodMillis() {

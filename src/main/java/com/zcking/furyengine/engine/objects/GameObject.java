@@ -13,10 +13,13 @@ public class GameObject {
 
     private final Vector3f rotation;
 
+    private int textPos;
+
     public GameObject() {
         position = new Vector3f(0, 0, 0);
         scale = 1;
         rotation = new Vector3f(0, 0, 0);
+        textPos = 0;
     }
 
     public GameObject(Mesh mesh) {
@@ -83,5 +86,13 @@ public class GameObject {
         for (int i = 0; i < numMeshes; i++) {
             this.meshes[i].cleanUp();
         }
+    }
+
+    public void setTextPos(int textPos) {
+        this.textPos = textPos;
+    }
+
+    public int getTextPos() {
+        return textPos;
     }
 }
