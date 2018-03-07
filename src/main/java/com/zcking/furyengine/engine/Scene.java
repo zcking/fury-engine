@@ -1,5 +1,6 @@
 package com.zcking.furyengine.engine;
 
+import com.zcking.furyengine.engine.graph.particles.IParticleEmitter;
 import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.lighting.SceneLight;
 import com.zcking.furyengine.rendering.Mesh;
@@ -21,6 +22,8 @@ public class Scene {
 
     private Fog fog;
 
+    private IParticleEmitter[] particleEmitters;
+
     public Scene() {
         meshMap = new HashMap<>();
         fog = Fog.NOFOG;
@@ -34,13 +37,15 @@ public class Scene {
         int numGameItems = gameItems != null ? gameItems.length : 0;
         for (int i=0; i<numGameItems; i++) {
             GameObject gameItem = gameItems[i];
-            Mesh mesh = gameItem.getMesh();
-            List<GameObject> list = meshMap.get(mesh);
-            if ( list == null ) {
-                list = new ArrayList<>();
-                meshMap.put(mesh, list);
+            Mesh[] meshes = gameItem.getMeshes();
+            for (Mesh mesh : meshes) {
+                List<GameObject> list = meshMap.get(mesh);
+                if (list == null) {
+                    list = new ArrayList<>();
+                    meshMap.put(mesh, list);
+                }
+                list.add(gameItem);
             }
-            list.add(gameItem);
         }
     }
 
@@ -72,6 +77,16 @@ public class Scene {
         for (Mesh mesh : meshMap.keySet()) {
             mesh.cleanUp();
         }
+        for (IParticleEmitter particleEmitter : particleEmitters) {
+            particleEmitter.cleanUp();
+        }
     }
 
+    public IParticleEmitter[] getParticleEmitters() {
+        return particleEmitters;
+    }
+
+    public void setParticleEmitters(IParticleEmitter[] particleEmitters) {
+        this.particleEmitters = particleEmitters;
+    }
 }

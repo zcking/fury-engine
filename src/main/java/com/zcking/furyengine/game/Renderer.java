@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.zcking.furyengine.engine.graph.animation.AnimatedFrame;
+import com.zcking.furyengine.engine.graph.particles.IParticleEmitter;
 import com.zcking.furyengine.engine.objects.AnimGameObject;
 import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.engine.IHud;
@@ -55,6 +56,8 @@ public class Renderer {
 
     private ShaderProgram skyBoxShaderProgram;
 
+    private ShaderProgram particlesShaderProgram;
+
     private final float specularPower;
 
     // Scene shader uniforms
@@ -90,6 +93,11 @@ public class Renderer {
     private static final String UNIFORM_DEPTH_MODEL_MAT = "modelLightViewMatrix";
     private static final String UNIFORM_DEPTH_JOINTS_MATRIX = "jointsMatrix";
 
+    // Particle shader uniforms
+    private static final String UNIFORM_PARTICLE_PROJ_MAT = "projectionMatrix";
+    private static final String UNIFORM_PARTICLE_MODEL_VIEW_MAT = "modelViewMatrix";
+    private static final String UNIFORM_PARTICLE_TEXTURE_SAMPLER = "textureSampler";
+
     public Renderer() {
         transformation = new Transformation();
         specularPower = 10f;
@@ -101,6 +109,7 @@ public class Renderer {
         setupDepthShader();
         setupSkyBoxShader();
         setupSceneShader();
+        setupParticlesShader();
         setupHudShader();
     }
 
@@ -118,6 +127,7 @@ public class Renderer {
         renderScene(window, camera, scene);
         if (scene.getSkyBox() != null)
             renderSkyBox(window, camera, scene);
+        renderParticles(window, camera, scene);
         if (hud != null)
             renderHud(window, hud);
 
@@ -191,6 +201,17 @@ public class Renderer {
         hudShaderProgram.createUniform(UNIFORM_HUD_PROJ_MODEL_MATRIX);
         hudShaderProgram.createUniform(UNIFORM_HUD_COLOR);
         hudShaderProgram.createUniform(UNIFORM_HUD_HAS_TEXTURE);
+    }
+
+    private void setupParticlesShader() throws Exception {
+        particlesShaderProgram = new ShaderProgram();
+        particlesShaderProgram.createVertexShader(ResourceUtils.loadResource("/shaders/particles_vertex.glsl"));
+        particlesShaderProgram.createFragmentShader(ResourceUtils.loadResource("/shaders/particles_fragment.glsl"));
+        particlesShaderProgram.link();
+
+        particlesShaderProgram.createUniform(UNIFORM_PARTICLE_PROJ_MAT);
+        particlesShaderProgram.createUniform(UNIFORM_PARTICLE_MODEL_VIEW_MAT);
+        particlesShaderProgram.createUniform(UNIFORM_PARTICLE_TEXTURE_SAMPLER);
     }
 
     public void clear() {
@@ -406,6 +427,38 @@ public class Renderer {
         glPopMatrix();
     }
 
+    public void renderParticles(Window window, Camera camera, Scene scene) {
+        particlesShaderProgram.bind();
+
+        particlesShaderProgram.setUniform(UNIFORM_PARTICLE_TEXTURE_SAMPLER, 0);
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix();
+        particlesShaderProgram.setUniform(UNIFORM_PARTICLE_PROJ_MAT, projectionMatrix);
+
+        Matrix4f viewMatrix = transformation.getViewMatrix();
+        IParticleEmitter[] emitters = scene.getParticleEmitters();
+        int numEmitters = emitters != null ? emitters.length : 0;
+
+        // Disable depth testing (so order of particles doesn't matter)
+        // and configure additive blending for more realistic particles
+        glDepthMask(false);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+        for (int i = 0; i < numEmitters; i++) {
+            IParticleEmitter emitter = emitters[i];
+            Mesh mesh = emitter.getBaseParticle().getMesh();
+
+            mesh.renderList(emitter.getParticles(), (GameObject gameObject) -> {
+                Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(gameObject, viewMatrix);
+                particlesShaderProgram.setUniform(UNIFORM_PARTICLE_MODEL_VIEW_MAT, modelViewMatrix);
+            });
+        }
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(true);
+
+        particlesShaderProgram.unbind();
+    }
+
     public void cleanUp() {
         if (shadowMap != null) {
             shadowMap.cleanUp();
@@ -421,6 +474,9 @@ public class Renderer {
         }
         if (hudShaderProgram != null) {
             hudShaderProgram.cleanUp();
+        }
+        if (particlesShaderProgram != null) {
+            particlesShaderProgram.cleanUp();
         }
     }
 }

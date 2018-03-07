@@ -77,4 +77,11 @@ public class GameObject {
     public void setMeshes(Mesh[] meshes) {
         this.meshes = meshes;
     }
+
+    public void cleanUp() {
+        int numMeshes = this.meshes != null ? this.meshes.length : 0;
+        for (int i = 0; i < numMeshes; i++) {
+            this.meshes[i].cleanUp();
+        }
+    }
 }
