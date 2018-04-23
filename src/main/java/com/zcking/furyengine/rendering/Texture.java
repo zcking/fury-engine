@@ -1,11 +1,8 @@
 package com.zcking.furyengine.rendering;
 
-import com.zcking.furyengine.engine.TextObject;
 import de.matthiasmann.twl.utils.PNGDecoder;
-import org.joml.Matrix4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.stb.STBTTBakedChar;
-import static org.lwjgl.stb.STBTruetype.*;
+
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -13,86 +10,94 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
+/**
+ * Defines a texture which can be used on game objects and rendering with OpenGL.
+ */
 public class Texture {
 
     private final int id;
-    private final int width;
-    private final int height;
-    private final STBTTBakedChar.Buffer cData;
 
-    public Texture(String filePath) throws Exception {
-        this(Texture.class.getResourceAsStream(filePath));
+    private final int width;
+
+    private final int height;
+
+    private int numRows = 1;
+
+    private int numCols = 1;
+
+    /**
+     * Creates an empty texture.
+     *
+     * @param width Width of the texture
+     * @param height Height of the texture
+     * @param pixelFormat Specifies the format of the pixel data (GL_RGBA, etc.)
+     * @throws Exception If the texture construction fails.
+     */
+    public Texture(int width, int height, int pixelFormat) throws Exception {
+        this.id = glGenTextures();
+        this.width = width;
+        this.height = height;
+        glBindTexture(GL_TEXTURE_2D, this.id);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, this.width, this.height, 0, pixelFormat, GL_FLOAT, (ByteBuffer) null);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+
+    public Texture(String fileName) throws Exception {
+        this(Texture.class.getResourceAsStream(fileName));
+    }
+
+    public Texture(String fileName, int numCols, int numRows) throws Exception  {
+        this(fileName);
+        this.numCols = numCols;
+        this.numRows = numRows;
     }
 
     public Texture(InputStream is) throws Exception {
-        // Load texture file
-        PNGDecoder decoder = new PNGDecoder(is);
+        try {
+            // Load Texture file
+            PNGDecoder decoder = new PNGDecoder(is);
 
-        this.width = decoder.getWidth();
-        this.height = decoder.getHeight();
+            this.width = decoder.getWidth();
+            this.height = decoder.getHeight();
 
-        // Load texture contents into a byte buffer (4 bytes per pixel)
-        ByteBuffer buffer = ByteBuffer.allocateDirect(
-                4 * decoder.getWidth() * decoder.getHeight()
-        );
-        decoder.decode(buffer, 4 * decoder.getWidth(), PNGDecoder.Format.RGBA);
-        buffer.flip();
+            // Load texture contents into a byte buffer
+            ByteBuffer buf = ByteBuffer.allocateDirect(
+                    4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+            buf.flip();
 
-        // Create a new OpenGL texture
-        int textureId = glGenTextures();
+            // Create a new OpenGL texture
+            this.id = glGenTextures();
+            // Bind the texture
+            glBindTexture(GL_TEXTURE_2D, this.id);
 
-        // Bind the texture
-        glBindTexture(GL_TEXTURE_2D, textureId);
+            // Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        // Tell OpenGL how to unpack the bytes. Each component is 1 byte
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            // Upload the texture data
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+            // Generate Mip Map
+            glGenerateMipmap(GL_TEXTURE_2D);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        // Upload the texture data
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(),
-                0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-        // Generate the mip map data
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        cData = null;
-
-        this.id = textureId;
+            is.close();
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
     }
 
-    protected Texture(int id, int width, int height, STBTTBakedChar.Buffer cData) {
-        this.id = id;
-        this.width = width;
-        this.height = height;
-        this.cData = cData;
+    public int getWidth() {
+        return this.width;
     }
 
-    public static Texture loadFontTexture(TextObject textObject, int BITMAP_W, int BITMAP_H) {
-        int textureId = glGenTextures();
-        STBTTBakedChar.Buffer cData = STBTTBakedChar.malloc(96);
-
-        ByteBuffer bitmap = BufferUtils.createByteBuffer(BITMAP_W * BITMAP_H);
-        int lineOffset = 1;
-        stbtt_BakeFontBitmap(
-                textObject.getTtf(),
-                textObject.getFontHeight() * 0.5f + 4.0f - lineOffset * textObject.getFontHeight(),
-                bitmap,
-                BITMAP_W, BITMAP_H,
-                32, cData);
-
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, BITMAP_W,
-                BITMAP_H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        return new Texture(textureId, BITMAP_H, BITMAP_H, cData);
+    public int getHeight() {
+        return this.height;
     }
 
     public void bind() {
@@ -105,16 +110,13 @@ public class Texture {
 
     public void cleanUp() {
         glDeleteTextures(id);
-        if (cData != null) {
-            cData.free();
-        }
     }
 
-    public int getWidth() {
-        return width;
+    public int getNumRows() {
+        return numRows;
     }
 
-    public int getHeight() {
-        return height;
+    public int getNumCols() {
+        return numCols;
     }
 }

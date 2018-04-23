@@ -2,12 +2,17 @@ package com.zcking.furyengine.lighting;
 
 import org.joml.Vector3f;
 
+/**
+ * Conveniently wraps all the common lighting objects for a
+ * scene (e.g. ambient light, point lights, spot lights, etc.).
+ */
 public class SceneLight {
 
     private Vector3f ambientLight;
     private PointLight[] pointLights;
     private SpotLight[] spotLights;
     private DirectionalLight directionalLight;
+    private Vector3f skyBoxLight;
 
     public Vector3f getAmbientLight() {
         return ambientLight;
@@ -39,5 +44,13 @@ public class SceneLight {
 
     public void setDirectionalLight(DirectionalLight directionalLight) {
         this.directionalLight = directionalLight;
+    }
+
+    public Vector3f getSkyBoxLight() {
+        return skyBoxLight;
+    }
+
+    public void setSkyBoxLight(Vector3f skyBoxLight) {
+        this.skyBoxLight = skyBoxLight;
     }
 }

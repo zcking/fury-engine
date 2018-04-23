@@ -1,5 +1,6 @@
 package com.zcking.furyengine.engine;
 
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -8,6 +9,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * The main wrapper and control class for the window/display.
+ */
 public class Window {
 
     private final String title;
@@ -18,15 +22,27 @@ public class Window {
     private boolean resized;
     private boolean vSync;
 
-    public Window(String title, int width, int height, boolean vSync) {
-        this.title = title;
-        this.width = width;
-        this.height = height;
-        this.vSync = vSync;
+    private final WindowSettings windowSettings;
+
+    /**
+     * Constructs a new window instance, but does not initialize it.
+     * @param settings The window configuration.
+     */
+    public Window(WindowSettings settings) {
+        this.title = settings.getInitialTitle();
+        this.width = settings.getInitialWidth();
+        this.height = settings.getInitialHeight();
+        this.vSync = settings.isvSyncEnabled();
+
+        this.windowSettings = settings;
     }
 
+    /**
+     * Initializes the window using the settings passed in at construction.
+     * @throws IllegalStateException If GLFW has not been initialized yet (or if it fails).
+     * @throws RuntimeException If fails to create the window.
+     */
     public void init() {
-        // TODO: Implement a WindowSettings wrapper for configurable things (resizing, etc.) to pass to this
 
         // Setup the error callback. The default implementation
         // will print the error message in System.err
@@ -39,12 +55,13 @@ public class Window {
 
         // Configure the new window
         glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // window will stay hidden after creation
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // window will be resizable
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+        glfwWindowHint(GLFW_VISIBLE, windowSettings.isInitiallyVisible() ? GLFW_TRUE : GLFW_FALSE); // window will stay hidden after creation
+        glfwWindowHint(GLFW_RESIZABLE, windowSettings.isResizable() ? GLFW_TRUE : GLFW_FALSE); // window will be resizable
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, windowSettings.getGlfwContextVersionMajor());
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, windowSettings.getGlfwContextVersionMinor());
+        glfwWindowHint(GLFW_OPENGL_PROFILE, windowSettings.getOpenGLProfile());
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, windowSettings.isOpenGLForwardCompat() ? GLFW_TRUE : GLFW_FALSE);
+        glfwWindowHint(GLFW_MAXIMIZED, windowSettings.isStartMaximized() ? GLFW_TRUE : GLFW_FALSE);
 
         // Create the window
         windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
@@ -60,26 +77,24 @@ public class Window {
         });
 
         // Setup a key callback. Called every time a key is pressed, repeated, or released
-        glfwSetKeyCallback(windowHandle, (windowId, key, scanCode, action, mods) -> {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                glfwSetWindowShouldClose(windowId, true);
-            }
-        });
+        glfwSetKeyCallback(windowHandle, windowSettings.getKeyCallback());
 
-        // Get the resolution of the primary monitor
-        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        if (windowSettings.isStartCentered()) {
+            // Get the resolution of the primary monitor
+            GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-        // Center the window
-        glfwSetWindowPos(
-                windowHandle,
-                (vidMode.width() - width) / 2,
-                (vidMode.height() - height) / 2
-        );
+            // Center the window
+            glfwSetWindowPos(
+                    windowHandle,
+                    (vidMode.width() - width) / 2,
+                    (vidMode.height() - height) / 2
+            );
+        }
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(windowHandle);
 
-        if (isvSync()) {
+        if (vSync) {
             // Enable v-sync
             glfwSwapInterval(1);
         }
@@ -90,34 +105,64 @@ public class Window {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glEnable(GL_DEPTH_TEST);
+        Vector4f clearColor = windowSettings.getClearColor();
+        glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 
-        // Support for transparencies
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        for (int target : windowSettings.getGlEnableTargets()) {
+            glEnable(target);
+        }
 
-        // Face culling
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+        if (windowSettings.isAlphaEnabled()) {
+            // Support for transparencies
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
 
-        // Shows polygons (useful for demonstration/debugging)
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        if (windowSettings.isCullingEnabled()) {
+            // Face culling
+            glEnable(GL_CULL_FACE);
+            glCullFace(windowSettings.getCullFace());
+        }
+
+        if (windowSettings.isShowPolygons()) {
+            // Shows polygons (useful for demonstration/debugging)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
     }
 
+    /**
+     * Swaps the window's buffers and polls it for events.
+     * Called by the main game engine once per frame.
+     */
     public void update() {
         glfwSwapBuffers(windowHandle);
         glfwPollEvents();
     }
 
+    /**
+     * Sets the window's clear color.
+     * @param r The red value of the clear color.
+     * @param g The green value of the clear color.
+     * @param b The blue value of the clear color.
+     * @param alpha The alpha value of the clear color.
+     */
     public void setClearColor(float r, float g, float b, float alpha) {
         glClearColor(r, g, b, alpha);
     }
 
+    /**
+     * Whether or not a given key was pressed.
+     * @param keyCode The key code to check for.
+     * @return true if the specified key was pressed; false otherwise.
+     */
     public boolean isKeyPressed(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
     }
 
+    /**
+     * Checks if the window should close due to some window event.
+     * @return true if the window should close; false otherwise.
+     */
     public boolean windowShouldClose() {
         return glfwWindowShouldClose(windowHandle);
     }

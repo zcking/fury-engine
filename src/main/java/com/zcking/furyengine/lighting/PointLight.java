@@ -3,13 +3,17 @@ package com.zcking.furyengine.lighting;
 
 import org.joml.Vector3f;
 
+/**
+ * Light which is placed at a given point and emits from that location,
+ * but fades away as objects get further from it.
+ */
 public class PointLight {
 
     private Vector3f color;
 
     private Vector3f position;
 
-    protected float intensity;
+    private float intensity;
 
     private Attenuation attenuation;
 

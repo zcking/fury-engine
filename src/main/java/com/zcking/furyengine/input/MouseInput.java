@@ -6,6 +6,9 @@ import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+/**
+ * Interface for receiving mouse input and output.
+ */
 public class MouseInput {
 
     private final Vector2d previousPos;

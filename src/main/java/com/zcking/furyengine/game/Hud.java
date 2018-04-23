@@ -2,7 +2,9 @@ package com.zcking.furyengine.game;
 
 import com.zcking.furyengine.engine.*;
 import com.zcking.furyengine.engine.Window;
-import com.zcking.furyengine.engine.graph.OBJLoader;
+import com.zcking.furyengine.engine.loaders.obj.OBJLoader;
+import com.zcking.furyengine.engine.objects.GameObject;
+import com.zcking.furyengine.engine.objects.TextItem;
 import com.zcking.furyengine.rendering.FontTexture;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
@@ -10,6 +12,10 @@ import org.joml.Vector4f;
 
 import java.awt.*;
 
+/**
+ * A simple implementation of the HUD interface. Allows for basic HUD elements such
+ * as text and graphics. Used for example purposes only.
+ */
 public class Hud implements IHud {
 
     private static final int FONT_COLS = 16;
