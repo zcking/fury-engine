@@ -5,6 +5,10 @@ import com.zcking.furyengine.rendering.Camera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * Helper/container for matrix transformations (e.g. model-view matrix, projection matrix, etc.).
+ * Useful for passing matrix data to the shaders.
+ */
 public class Transformation {
 
     private static final Vector3f X_AXIS = new Vector3f(1, 0, 0);
@@ -31,6 +35,9 @@ public class Transformation {
 
     private final Matrix4f orthoModelMatrix;
 
+    /**
+     * Constructs a new, blank transformation collection.
+     */
     public Transformation() {
         projectionMatrix = new Matrix4f();
         modelMatrix = new Matrix4f();
@@ -48,6 +55,15 @@ public class Transformation {
         return projectionMatrix;
     }
 
+    /**
+     * Set the projection matrix, according to the given aspect ratio and near/far planes.
+     * @param fov The Field-of-View for the frustum.
+     * @param width The width of the frustum.
+     * @param height The height of the frustum.
+     * @param zNear The near plane distance.
+     * @param zFar The far plane distance.
+     * @return The computed projection matrix.
+     */
     public Matrix4f updateProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
         float aspectRatio = width / height;
         projectionMatrix.identity();
@@ -59,6 +75,16 @@ public class Transformation {
         return orthoProjMatrix;
     }
 
+    /**
+     * Sets the orthographic projection matrix, according to the orthographic parameters.
+     * @param left The left boundary.
+     * @param right The right boundary.
+     * @param bottom The bottom boundary.
+     * @param top The top boundary.
+     * @param zNear The near plane distance.
+     * @param zFar The far plane distance.
+     * @return The computed orthographic projection matrix.
+     */
     public Matrix4f updateOrthoProjectionMatrix(float left, float right, float bottom, float top, float zNear, float zFar) {
         orthoProjMatrix.identity();
         orthoProjMatrix.setOrtho(left, right, bottom, top, zNear, zFar);
@@ -69,6 +95,11 @@ public class Transformation {
         return viewMatrix;
     }
 
+    /**
+     * Sets the view matrix based on the current state of the {@link Camera} instance given.
+     * @param camera The camera instance to base the "view" on.
+     * @return The computed view matrix.
+     */
     public Matrix4f updateViewMatrix(Camera camera) {
         return updateGenericViewMatrix(camera.getPosition(), camera.getRotation(), viewMatrix);
     }

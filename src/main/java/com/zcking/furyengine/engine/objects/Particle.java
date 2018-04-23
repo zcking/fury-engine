@@ -4,6 +4,11 @@ import com.zcking.furyengine.rendering.Mesh;
 import com.zcking.furyengine.rendering.Texture;
 import org.joml.Vector3f;
 
+/**
+ * Implements a simple particle that can be used by an implemented
+ * {@link com.zcking.furyengine.engine.graph.particles.IParticleEmitter} for
+ * particle effects.
+ */
 public class Particle extends GameObject {
 
     private long updateTextureMillis;
@@ -19,6 +24,13 @@ public class Particle extends GameObject {
 
     private int animFrames;
 
+    /**
+     * Constructs a new particle.
+     * @param mesh The mesh for the particle game object.
+     * @param speed The velocity of the particle.
+     * @param ttl The time-to-live for the particle (in milliseconds).
+     * @param updateTextureMillis The texture update rate for the particle (in milliseconds).
+     */
     public Particle(Mesh mesh, Vector3f speed, long ttl, long updateTextureMillis) {
         super(mesh);
         this.speed = new Vector3f(speed);
@@ -29,12 +41,22 @@ public class Particle extends GameObject {
         this.animFrames = texture.getNumCols() * texture.getNumRows();
     }
 
+    /**
+     * Constructs a new particle.
+     * @param mesh The mesh for the particle game object.
+     * @param speed The velocity of the particle.
+     * @param ttl The time-to-live for the particle (in milliseconds).
+     */
     public Particle(Mesh mesh, Vector3f speed, long ttl) {
         super(mesh);
         this.speed = new Vector3f(speed);
         this.ttl = ttl;
     }
 
+    /**
+     * Construct a copy of a particle.
+     * @param baseParticle The particle to copy.
+     */
     public Particle(Particle baseParticle) {
         super(baseParticle.getMesh());
         Vector3f aux = baseParticle.getPosition();

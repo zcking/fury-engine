@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A container for common "scene" items (e.g. mesh collection, skybox, lighting objects, etc.).
+ * Can be used to simply game implementations.
+ */
 public class Scene {
 
     private Map<Mesh, List<GameObject>> meshMap;
@@ -24,6 +28,10 @@ public class Scene {
 
     private IParticleEmitter[] particleEmitters;
 
+    /**
+     * Constructs a new {@link Scene} and initializes the {@link Scene#meshMap}
+     * collection and {@link Scene#fog}.
+     */
     public Scene() {
         meshMap = new HashMap<>();
         fog = Fog.NOFOG;
@@ -33,6 +41,11 @@ public class Scene {
         return meshMap;
     }
 
+    /**
+     * Seeds the game objects from an array. Automatically maps
+     * the meshes to game objects, based on the stored meshes in the objects.
+     * @param gameItems The array of {@link GameObject} to store.
+     */
     public void setGameObjects(GameObject[] gameItems) {
         int numGameItems = gameItems != null ? gameItems.length : 0;
         for (int i=0; i<numGameItems; i++) {
@@ -73,6 +86,9 @@ public class Scene {
         this.fog = fog;
     }
 
+    /**
+     * Perform any necessary garbage collection.
+     */
     public void cleanUp() {
         for (Mesh mesh : meshMap.keySet()) {
             mesh.cleanUp();

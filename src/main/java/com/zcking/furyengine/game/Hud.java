@@ -12,6 +12,10 @@ import org.joml.Vector4f;
 
 import java.awt.*;
 
+/**
+ * A simple implementation of the HUD interface. Allows for basic HUD elements such
+ * as text and graphics. Used for example purposes only.
+ */
 public class Hud implements IHud {
 
     private static final int FONT_COLS = 16;

@@ -2,6 +2,9 @@ package com.zcking.furyengine.lighting;
 
 import org.joml.Vector3f;
 
+/**
+ * Light emitting from a cone shape (e.g. flashlight effect).
+ */
 public class SpotLight {
 
     private PointLight pointLight;

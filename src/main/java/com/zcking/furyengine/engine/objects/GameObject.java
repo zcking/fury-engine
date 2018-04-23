@@ -3,6 +3,10 @@ package com.zcking.furyengine.engine.objects;
 import com.zcking.furyengine.rendering.Mesh;
 import org.joml.Vector3f;
 
+/**
+ * The base game object. Stores and managed the state of the objects
+ * a game implementation can easily use.
+ */
 public class GameObject {
 
     private Mesh[] meshes;
@@ -15,6 +19,9 @@ public class GameObject {
 
     private int textPos;
 
+    /**
+     * Constructs a new, empty game object.
+     */
     public GameObject() {
         position = new Vector3f(0, 0, 0);
         scale = 1;
@@ -22,11 +29,19 @@ public class GameObject {
         textPos = 0;
     }
 
+    /**
+     * Constructs a new game object with a {@link Mesh}.
+     * @param mesh The mesh for the game object.
+     */
     public GameObject(Mesh mesh) {
         this();
         this.meshes = new Mesh[]{mesh};
     }
 
+    /**
+     * Constructs a new game object with multiple {@link Mesh}.
+     * @param meshes The meshes for the game object.
+     */
     public GameObject(Mesh[] meshes) {
         this();
         this.meshes = meshes;
@@ -36,6 +51,12 @@ public class GameObject {
         return position;
     }
 
+    /**
+     * Sets the position for the game object in the world.
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @param z The z-coordinate.
+     */
     public void setPosition(float x, float y, float z) {
         this.position.x = x;
         this.position.y = y;
@@ -81,6 +102,9 @@ public class GameObject {
         this.meshes = meshes;
     }
 
+    /**
+     * Performs the necessary cleanup of the game object and its meshes.
+     */
     public void cleanUp() {
         int numMeshes = this.meshes != null ? this.meshes.length : 0;
         for (int i = 0; i < numMeshes; i++) {

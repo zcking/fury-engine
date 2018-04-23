@@ -10,6 +10,9 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
+/**
+ * Defines a texture which can be used on game objects and rendering with OpenGL.
+ */
 public class Texture {
 
     private final int id;
@@ -28,7 +31,7 @@ public class Texture {
      * @param width Width of the texture
      * @param height Height of the texture
      * @param pixelFormat Specifies the format of the pixel data (GL_RGBA, etc.)
-     * @throws Exception
+     * @throws Exception If the texture construction fails.
      */
     public Texture(int width, int height, int pixelFormat) throws Exception {
         this.id = glGenTextures();

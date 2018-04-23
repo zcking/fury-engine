@@ -17,6 +17,9 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
 
+/**
+ * Compiles, initializes, loads, and manages a shader program.
+ */
 public class ShaderProgram {
 
     private final int programId;

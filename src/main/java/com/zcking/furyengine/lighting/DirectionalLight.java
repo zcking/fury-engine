@@ -2,6 +2,10 @@ package com.zcking.furyengine.lighting;
 
 import org.joml.Vector3f;
 
+/**
+ * Directional light in which the magnitude of the light never changes. Only direction, color, and intensity
+ * can change the effect of the light.
+ */
 public class DirectionalLight {
 
     private Vector3f color;

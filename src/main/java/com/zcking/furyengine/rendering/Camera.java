@@ -2,6 +2,11 @@ package com.zcking.furyengine.rendering;
 
 import org.joml.Vector3f;
 
+/**
+ * The main camera implementation. The camera object acts as a view
+ * which can be used by shader programs for with a view matrix to
+ * provide perspective or orthographic views of the game.
+ */
 public class Camera {
 
     private final Vector3f position;

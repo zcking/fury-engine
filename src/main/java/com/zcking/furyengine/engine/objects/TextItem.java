@@ -1,6 +1,5 @@
 package com.zcking.furyengine.engine.objects;
 
-import com.zcking.furyengine.engine.objects.GameObject;
 import com.zcking.furyengine.rendering.FontTexture;
 import com.zcking.furyengine.rendering.Material;
 import com.zcking.furyengine.rendering.Mesh;
@@ -9,6 +8,9 @@ import com.zcking.furyengine.utils.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A 2D game object for displaying text in a game. Useful for HUD elements.
+ */
 public class TextItem extends GameObject {
 
     private static final float ZPOS = 0.0f;
@@ -18,6 +20,12 @@ public class TextItem extends GameObject {
     private String text;
     private FontTexture fontTexture;
 
+    /**
+     * Constructs a new text game object.
+     * @param text The text to display.
+     * @param fontTexture The texture to use for the text.
+     * @throws Exception If the texture game object's construction fails.
+     */
     public TextItem(String text, FontTexture fontTexture) throws Exception {
         super();
         this.text = text;

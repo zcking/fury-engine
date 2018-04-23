@@ -5,6 +5,9 @@ import de.matthiasmann.twl.utils.PNGDecoder;
 import org.joml.Vector3f;
 import java.nio.ByteBuffer;
 
+/**
+ * An implementation of terrain, as a grid of triangle strips.
+ */
 public class Terrain {
 
     private final GameObject[] gameObjects;
@@ -14,6 +17,17 @@ public class Terrain {
     private final int verticesPerRow;
     private final HeightMapMesh heightMapMesh;
 
+    /**
+     * Constructs a new terrain object.
+     * @param terrainSize The square size of the terrain.
+     * @param scale The world scale of the terrain.
+     * @param minY The minimum Y (height) of the terrain.
+     * @param maxY The maximum Y (height) of the terrain.
+     * @param heightMapFile File path to the height map for the terrain.
+     * @param textureFile File path to the texture for the terrain.
+     * @param textInc Increment offset value for the texture.
+     * @throws Exception If the terrain construction fails.
+     */
     public Terrain(int terrainSize, float scale, float minY, float maxY, String heightMapFile, String textureFile, int textInc) throws Exception {
         this.terrainSize = terrainSize;
         gameObjects = new GameObject[terrainSize * terrainSize];
@@ -44,6 +58,11 @@ public class Terrain {
         }
     }
 
+    /**
+     * Get the height (Y-value) of the terrain at a given world coordinate.
+     * @param position The world coordinate.
+     * @return The height (Y-value) of the terrain.
+     */
     public float getHeight(Vector3f position) {
         float result = Float.MIN_VALUE;
 
@@ -67,6 +86,10 @@ public class Terrain {
         return result;
     }
 
+    /**
+     * Get the game objects within this terrain.
+     * @return Array of game objects in the terrain.
+     */
     public GameObject[] getGameObjects() {
         return gameObjects;
     }
@@ -84,6 +107,9 @@ public class Terrain {
         return new Box2D(topLeftX, topLeftZ, width, height);
     }
 
+    /**
+     * Helper that wraps the bounding box information for the terrain objects.
+     */
     static class Box2D {
 
         public float x;
@@ -106,16 +132,16 @@ public class Terrain {
         }
     }
 
-    protected float getDiagonalZCoord(float x1, float z1, float x2, float z2, float x) {
+    private float getDiagonalZCoord(float x1, float z1, float x2, float z2, float x) {
         return ((z1 - z2) / (x1 - x2)) * (x - x1) + z1;
     }
 
-    protected float getWorldHeight(int row, int col, GameObject gameObject) {
+    private float getWorldHeight(int row, int col, GameObject gameObject) {
         float y = heightMapMesh.getHeight(row, col);
         return y * gameObject.getScale() + gameObject.getPosition().y;
     }
 
-    protected float interpolateHeight(Vector3f pA, Vector3f pB, Vector3f pC, float x, float z) {
+    private float interpolateHeight(Vector3f pA, Vector3f pB, Vector3f pC, float x, float z) {
         // Plane equation -> ax+by+cz+d = 0
         float a = (pB.y - pA.y) * (pC.z - pA.z) - (pC.y - pA.y) * (pB.z - pA.z);
         float b = (pB.z - pA.z) * (pC.x - pA.x) - (pC.z - pA.z) * (pB.x - pA.x);
@@ -126,7 +152,7 @@ public class Terrain {
         return y;
     }
 
-    protected Vector3f[] getTriangle(Vector3f position, Box2D boundingBox, GameObject terrainBlock) {
+    private Vector3f[] getTriangle(Vector3f position, Box2D boundingBox, GameObject terrainBlock) {
         // Get the column and row of the heightmap associated with the current position
         float cellWidth = boundingBox.width / (float) verticesPerCol;
         float cellHeight = boundingBox.height / (float) verticesPerRow;

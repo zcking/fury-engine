@@ -23,12 +23,15 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL30;
 
-import static org.lwjgl.opengl.ARBFramebufferObject.GL_FRAMEBUFFER;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 
+/**
+ * Handles all the rendering operations to OpenGL and the fury engine shaders. Used for examples
+ * and demonstration purposes, but could easily be used as a drop-in for new games.
+ */
 public class Renderer {
 
     private static final float FOV = (float) Math.toRadians(60.0f);
@@ -99,11 +102,19 @@ public class Renderer {
     private static final String UNIFORM_PARTICLE_TEX_XOFFSET = "texXOffset";
     private static final String UNIFORM_PARTICLE_TEX_YOFFSET = "texYOffset";
 
+    /**
+     * Constructs the renderer, ready for initialization.
+     */
     public Renderer() {
         transformation = new Transformation();
         specularPower = 10f;
     }
 
+    /**
+     * Initializes the render and its shader programs.
+     * @param window The window to render to.
+     * @throws Exception If the initialization fails.
+     */
     public void init(Window window) throws Exception {
         shadowMap = new ShadowMap();
 
@@ -114,6 +125,13 @@ public class Renderer {
         setupHudShader();
     }
 
+    /**
+     * Render the scene and view to the given window.
+     * @param window Window to render to.
+     * @param camera Camera to project a view from.
+     * @param scene The scene to render.
+     * @param hud Optional HUD to render on top of the display.
+     */
     public void render(Window window, Camera camera, Scene scene, IHud hud) {
         clear();
 
@@ -285,7 +303,7 @@ public class Renderer {
         }
     }
 
-    public void renderScene(Window window, Camera camera, Scene scene) {
+    private void renderScene(Window window, Camera camera, Scene scene) {
         sceneShaderProgram.bind();
 
         Matrix4f projectionMatrix = transformation.getProjectionMatrix();
@@ -432,7 +450,7 @@ public class Renderer {
         glPopMatrix();
     }
 
-    public void renderParticles(Window window, Camera camera, Scene scene) {
+    private void renderParticles(Window window, Camera camera, Scene scene) {
         particlesShaderProgram.bind();
 
         particlesShaderProgram.setUniform(UNIFORM_PARTICLE_TEXTURE_SAMPLER, 0);
@@ -481,6 +499,10 @@ public class Renderer {
         particlesShaderProgram.unbind();
     }
 
+    /**
+     * Performs all the garbage collection and cleanup
+     * of the shader programs and renderer resources.
+     */
     public void cleanUp() {
         if (shadowMap != null) {
             shadowMap.cleanUp();

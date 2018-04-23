@@ -9,6 +9,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+/**
+ * The main wrapper and control class for the window/display.
+ */
 public class Window {
 
     private final String title;
@@ -21,6 +24,10 @@ public class Window {
 
     private final WindowSettings windowSettings;
 
+    /**
+     * Constructs a new window instance, but does not initialize it.
+     * @param settings The window configuration.
+     */
     public Window(WindowSettings settings) {
         this.title = settings.getInitialTitle();
         this.width = settings.getInitialWidth();
@@ -30,6 +37,11 @@ public class Window {
         this.windowSettings = settings;
     }
 
+    /**
+     * Initializes the window using the settings passed in at construction.
+     * @throws IllegalStateException If GLFW has not been initialized yet (or if it fails).
+     * @throws RuntimeException If fails to create the window.
+     */
     public void init() {
 
         // Setup the error callback. The default implementation
@@ -118,19 +130,39 @@ public class Window {
         }
     }
 
+    /**
+     * Swaps the window's buffers and polls it for events.
+     * Called by the main game engine once per frame.
+     */
     public void update() {
         glfwSwapBuffers(windowHandle);
         glfwPollEvents();
     }
 
+    /**
+     * Sets the window's clear color.
+     * @param r The red value of the clear color.
+     * @param g The green value of the clear color.
+     * @param b The blue value of the clear color.
+     * @param alpha The alpha value of the clear color.
+     */
     public void setClearColor(float r, float g, float b, float alpha) {
         glClearColor(r, g, b, alpha);
     }
 
+    /**
+     * Whether or not a given key was pressed.
+     * @param keyCode The key code to check for.
+     * @return true if the specified key was pressed; false otherwise.
+     */
     public boolean isKeyPressed(int keyCode) {
         return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
     }
 
+    /**
+     * Checks if the window should close due to some window event.
+     * @return true if the window should close; false otherwise.
+     */
     public boolean windowShouldClose() {
         return glfwWindowShouldClose(windowHandle);
     }
